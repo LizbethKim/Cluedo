@@ -12,6 +12,9 @@ public class Main {
 	public static void main(String[] args){
 		try {
 			Board board = createBoardFromFile("board.txt");
+			System.out.println(board.findRoom(512));
+			System.out.println(board.findWeapon(512));
+			System.out.println(board.findChar(512));
 		} catch (IOException e) {e.printStackTrace();}
 		System.out.println("Populated");
 		System.exit(0);
@@ -19,7 +22,7 @@ public class Main {
 	
 	
 	
-	private static Board createBoardFromFile(String filename) throws IOException {		
+	public static Board createBoardFromFile(String filename) throws IOException {		
 		FileReader fr = new FileReader(filename);		
 		BufferedReader br = new BufferedReader(fr);
 		ArrayList<String> lines = new ArrayList<String>();

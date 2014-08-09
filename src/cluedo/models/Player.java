@@ -3,20 +3,48 @@ package cluedo.models;
 import java.util.List;
 
 import cluedo.Coordinate;
+import cluedo.board.Board;
 
 public class Player implements Comparable{
 
 	private int character;
 	private Coordinate coords;
 	private List<Card> cards;
+	private int room;
 	
 	public Player(int character, int x, int y){
 		this.character = character;
 		coords = new Coordinate(x, y);
+		room = Board.NOTHING;
 	}
 	
 	public int getChar(){
 		return character;
+	}
+	
+	public List<Card> getCards(){
+		return cards;
+	}
+	
+	public boolean hasCard(int card){
+		for (Card c: cards){
+			if (c.getCard() == card){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void addCard(Card card){
+		cards.add(card);
+	}
+	
+	public int currentRoom(){
+		return room;
+	}
+	
+	public void setRoom(int room){
+		this.room = room;
 	}
 	
 	@Override
@@ -32,6 +60,10 @@ public class Player implements Comparable{
 	public boolean at(Coordinate coordinate) {
 		if (coords.equals(coordinate)) return true;
 		return false;
+	}
+
+	public void setCoords(Coordinate coordinate) {
+		this.coords = coordinate;
 	}
 	
 }

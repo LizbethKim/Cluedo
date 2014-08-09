@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import cluedo.Coordinate;
+import cluedo.models.Card;
 import cluedo.models.Hallway;
 import cluedo.models.Player;
 import cluedo.models.Room;
@@ -13,8 +14,13 @@ import cluedo.models.Wall;
 
 public class Board {
 	
-	//Characters
+	//Success/Failure
 	public static final int NOTHING = 0;
+	public static final int SUCCESS = 7;
+	public static final int INVALIDCARD = 8;
+	public static final int NEXTTURN = 9;
+	
+	//Characters
 	public static final int SCARLETT = 1;
 	public static final int MUSTARD = 2;
 	public static final int WHITE = 3;
@@ -48,6 +54,9 @@ public class Board {
 	private int numPlayers;
 	private int currentPlayer;
 	private int currentMove;
+	private int currentSuggest;		//Current set of cards being suggested
+	private int refutePlayer;		//Used for when going around to refute a suggestion/accusition
+	private int currentAccuse;		//Current set of cards being accused
 	private boolean[][] aStarBoard;
 	
 	/*
@@ -63,6 +72,8 @@ public class Board {
 		board = new Square[x][y];
 		currentState = -1;
 		generateRoomList();
+		currentSuggest = 0;
+		currentAccuse = 0;
 	}
 	
 	/*
@@ -75,8 +86,113 @@ public class Board {
 		numPlayers = playerList.size()-1;
 		currentState = 0;
 		currentPlayer = 0;
+		refutePlayer = 0;
 		aStarBoard = aStarBoard();
 		return true;
+	}
+	
+	public int currentPlayer(){
+		return playerList.get(currentPlayer).getChar();
+	}
+	
+	public Player getCurrentPlayer(){
+		return playerList.get(currentPlayer);
+	}
+	
+	//Must ensure Player's room is set correctly before attempting this 
+	public boolean takePassage(){
+		if (currentState == 0){
+			if (playerList.get(currentPlayer).currentRoom() != NOTHING){
+				Coordinate temp = playerList.get(currentPlayer).getCoords();
+				int passage = ((Room) (board[temp.getX()][temp.getY()])).getPassage();
+				if (passage != NOTHING){
+					playerList.get(currentPlayer).setRoom(passage);
+					//Gets the room from the roomList using the ID given by the passage. Looks more complicated than it is
+					playerList.get(currentPlayer).setCoords(roomList.get(convertRoom(passage)).getExits().get(0));
+					moveState();
+					moveState();
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public boolean suggest(int suggestion){
+		if (currentState == 2){
+			this.currentSuggest = suggestion;
+			refutePlayer = currentPlayer + 1;
+			moveState();
+			return true;
+		}
+		return false;
+	}
+	
+	public int refute(int cardNum){
+		if (cardNum == 0) {
+			moveRefute();
+			if (refutePlayer == currentPlayer){
+				nextTurn();
+				return NEXTTURN;
+			}
+			return NOTHING;
+		}
+		if (playerList.get(refutePlayer).hasCard(cardNum)){
+			if (findRoom(currentSuggest) == findRoom(cardNum)) {
+				nextTurn();
+				return findRoom(currentSuggest);
+			} else if (findWeapon(currentSuggest) == findWeapon(cardNum)){
+				nextTurn();
+				return findWeapon(currentSuggest);
+			} else if (findChar(currentSuggest) == findChar(cardNum)){
+				nextTurn();
+				return findChar(currentSuggest);
+			}
+		}
+		moveRefute();
+		if (refutePlayer == currentPlayer){
+			nextTurn();
+			return NEXTTURN;
+		}
+		return INVALIDCARD;
+	}
+	
+	//Starts the next turn. Should only be called by Board. 
+	private void nextTurn(){
+		movePlayer();
+		currentState = 0;
+	}
+	
+	//Moves the variable to the next player/state
+	public void moveRefute(){
+		refutePlayer = (refutePlayer + 1) % numPlayers;
+	}
+	
+	public void moveState(){
+		currentState = (currentState + 1) % 4;
+	}
+	
+	public void movePlayer(){
+		currentPlayer = (currentPlayer + 1) % numPlayers;
+	}
+	
+	
+	//Converts a number into a single digit room ID number to access roomList (from a 3 digit combo)
+	public int convertRoom(int room){
+		return ((room/100)%10);
+	}
+	
+	//Converts a number into the appropriate ENUM values for comparisons (from a 3 digit combo)
+	public int findRoom(int room){
+		return ((room/100)%10)*100;
+	}
+	
+	public int findWeapon(int weapon){
+		return ((weapon/10)%10)*10;
+	}
+	
+	public int findChar(int character){
+		return (character%10);
 	}
 	
 	public boolean rollDice(int roll){
@@ -131,6 +247,23 @@ public class Board {
 		roomList.add(new Room(LOUNGE));
 		roomList.add(new Room(DINING));
 		roomList.get(1).addPassage(STUDY);
+		roomList.get(1).addExit(new Coordinate(4, 6));
+		roomList.get(2).addExit(new Coordinate(8, 5));
+		roomList.get(2).addExit(new Coordinate(9, 7));
+		roomList.get(2).addExit(new Coordinate(14, 7));
+		roomList.get(2).addExit(new Coordinate(15, 5));
+		roomList.get(3).addExit(new Coordinate(19, 5));
+		roomList.get(4).addExit(new Coordinate(18, 9));
+		roomList.get(4).addExit(new Coordinate(22, 12));
+		roomList.get(5).addExit(new Coordinate(20, 14));
+		roomList.get(5).addExit(new Coordinate(17, 16));
+		roomList.get(6).addExit(new Coordinate(17, 21));
+		roomList.get(7).addExit(new Coordinate(14, 20));
+		roomList.get(7).addExit(new Coordinate(12, 18));
+		roomList.get(7).addExit(new Coordinate(11, 18));
+		roomList.get(8).addExit(new Coordinate(6, 19));
+		roomList.get(9).addExit(new Coordinate(6, 15));
+		roomList.get(9).addExit(new Coordinate(7, 12));
 		roomList.get(6).addPassage(KITCHEN);
 		roomList.get(3).addPassage(LOUNGE);
 		roomList.get(8).addPassage(CONSERVATORY);
@@ -150,6 +283,7 @@ public class Board {
 		for (int i = 0; i < board[0].length; i++){
 			for (int j = 0; j < board.length; j++){
 				boolean isPlayer = false;
+				boolean isRoom = false;
 				for (Player p: playerList){
 					if (p.at(new Coordinate(j, i))){
 						System.out.print("P");
@@ -157,6 +291,16 @@ public class Board {
 					}
 				}
 				if (!isPlayer){
+					for (Room r: roomList){
+						for (Coordinate c: r.getExits()){
+							if (c.getX() == j && c.getY() == i){
+								System.out.print("X");
+								isRoom = true;
+							}
+						}
+					}
+				}
+				if (!isPlayer && !isRoom){
 					if (board[j][i] instanceof Wall){
 						System.out.print("W");
 					} else if (board[j][i] instanceof Room){
@@ -185,8 +329,6 @@ public class Board {
 			Coordinate loc = p.getCoords();
 			aStarBoard[loc.getX()][loc.getY()] = false;
 		}
-		
-		
 		return aStarBoard;
 	}
 

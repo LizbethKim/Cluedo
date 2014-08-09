@@ -1,13 +1,16 @@
 package cluedo.models;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import cluedo.Coordinate;
 
 
 public class Room implements Square{
 	private int name;
-	private int cards;
+	private List<Card> cards;
 	private int passage;
-	private List<Exit> exits;
+	private List<Coordinate> exits;
 
 	@Override
 	public int hashCode() {
@@ -34,18 +37,28 @@ public class Room implements Square{
 	public Room(int name){
 		this.name = name;
 		this.passage = 0;
+		cards = new ArrayList<Card>();
+		exits = new ArrayList<Coordinate>();
 	}
 
+	public void addExit(Coordinate coord){
+		exits.add(coord);
+	}
+	
+	public List<Coordinate> getExits(){
+		return exits;
+	}
+	
 	public int getName(){
 		return name;
 	}
 	
-	public int getCards(){
+	public List<Card> getCards(){
 		return cards;
 	}
 	
-	public void addCard(){
-		
+	public void addCard(Card card){
+		cards.add(card);
 	}
 	
 	public void addPassage(int x){
