@@ -12,13 +12,6 @@ public class Main {
 	public static void main(String[] args){
 		try {
 			Board board = createBoardFromFile("board.txt");
-			board.addPlayer(1);
-			board.addPlayer(2);
-			board.addPlayer(3);
-			board.addPlayer(4);
-			board.addPlayer(5);
-			board.addPlayer(6);
-			board.printBoard();
 		} catch (IOException e) {e.printStackTrace();}
 		System.out.println("Populated");
 		System.exit(0);

@@ -68,26 +68,32 @@ public class Board {
 	/*
 	 * Sets the number of players, sorts players into order, sets current player, creates new "Can go" map, sets state to first state. 
 	 */
-	public void startGame(){
-		if (currentState != -1) throw new UnsupportedOperationException();
+	@SuppressWarnings("unchecked")
+	public boolean startGame(){
+		if (currentState != -1) return false;
 		Collections.sort(playerList);
 		numPlayers = playerList.size()-1;
 		currentState = 0;
 		currentPlayer = 0;
 		aStarBoard = aStarBoard();
+		return true;
 	}
 	
-	public void rollDice(int roll){
-		if (currentState == 0) currentMove = roll;
+	public boolean rollDice(int roll){
+		if (currentState == 0) {
+			currentMove = roll;
+			return true;
+		}
+		return false;
 	}
 	
 	public int getState(){
 		return currentState;
 	}
 	
-	public void addPlayer(int chara){
+	public boolean addPlayer(int chara){
 		if (currentState != -1){
-			throw new UnsupportedOperationException();
+			return false;
 		} else {
 			switch(chara){
 				case SCARLETT:
@@ -109,6 +115,7 @@ public class Board {
 					playerList.add(new Player(PLUM, 23, 19));
 					break;
 			}
+			return true;
 		}
 	}
 	
