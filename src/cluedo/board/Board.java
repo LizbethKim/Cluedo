@@ -1,0 +1,186 @@
+package cluedo.board;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import cluedo.Coordinate;
+import cluedo.models.Hallway;
+import cluedo.models.Player;
+import cluedo.models.Room;
+import cluedo.models.Square;
+import cluedo.models.Wall;
+
+public class Board {
+	
+	//Characters
+	public static final int NOTHING = 0;
+	public static final int SCARLETT = 1;
+	public static final int MUSTARD = 2;
+	public static final int WHITE = 3;
+	public static final int GREEN = 4;
+	public static final int PEACOCK = 5;
+	public static final int PLUM = 6;
+	
+	//Weapons
+	public static final int CANDLESTICK = 10;
+	public static final int DAGGER = 20;
+	public static final int PIPE = 30;
+	public static final int REVOLVER = 40;
+	public static final int ROPE = 50;
+	public static final int SPANNER = 60;
+	
+	//Rooms
+	public static final int KITCHEN = 100;
+	public static final int BALLROOM = 200;
+	public static final int CONSERVATORY = 300;
+	public static final int BILLARD = 400;
+	public static final int LIBRARY = 500;
+	public static final int STUDY = 600;
+	public static final int HALL = 700;
+	public static final int LOUNGE = 800;
+	public static final int DINING = 900;
+
+	
+	private Square[][] board;
+	private List<Room> roomList = new ArrayList<Room>();
+	private List<Player> playerList = new ArrayList<Player>();
+	private int numPlayers;
+	private int currentPlayer;
+	private int currentMove;
+	private boolean[][] aStarBoard;
+	
+	/*
+	 * States: -1 = Initialization
+	 * 0 = Start Turn (Roll dice/Secret Passage/Make accusation)
+	 * 1 = Move
+	 * 2 = Suggest/Accuse
+	 * 3 = Refute
+	 */
+	private int currentState;
+	
+	public Board(int x, int y){
+		board = new Square[x][y];
+		currentState = -1;
+		generateRoomList();
+	}
+	
+	/*
+	 * Sets the number of players, sorts players into order, sets current player, creates new "Can go" map, sets state to first state. 
+	 */
+	public void startGame(){
+		if (currentState != -1) throw new UnsupportedOperationException();
+		Collections.sort(playerList);
+		numPlayers = playerList.size()-1;
+		currentState = 0;
+		currentPlayer = 0;
+		aStarBoard = aStarBoard();
+	}
+	
+	public void rollDice(int roll){
+		if (currentState == 0) currentMove = roll;
+	}
+	
+	public int getState(){
+		return currentState;
+	}
+	
+	public void addPlayer(int chara){
+		if (currentState != -1){
+			throw new UnsupportedOperationException();
+		} else {
+			switch(chara){
+				case SCARLETT:
+					playerList.add(new Player(SCARLETT, 7, 24));
+					break;
+				case MUSTARD:
+					playerList.add(new Player(MUSTARD, 0, 17));
+					break;
+				case WHITE:
+					playerList.add(new Player(WHITE, 9, 0));
+					break;
+				case GREEN:
+					playerList.add(new Player(GREEN, 14, 0));
+					break;
+				case PEACOCK:
+					playerList.add(new Player(PEACOCK, 23, 6));
+					break;
+				case PLUM:
+					playerList.add(new Player(PLUM, 23, 19));
+					break;
+			}
+		}
+	}
+	
+	private void generateRoomList(){
+		roomList.add(new Room(NOTHING));
+		roomList.add(new Room(KITCHEN));
+		roomList.add(new Room(BALLROOM));
+		roomList.add(new Room(CONSERVATORY));
+		roomList.add(new Room(BILLARD));
+		roomList.add(new Room(LIBRARY));
+		roomList.add(new Room(STUDY));
+		roomList.add(new Room(HALL));
+		roomList.add(new Room(LOUNGE));
+		roomList.add(new Room(DINING));
+		roomList.get(1).addPassage(STUDY);
+		roomList.get(6).addPassage(KITCHEN);
+		roomList.get(3).addPassage(LOUNGE);
+		roomList.get(8).addPassage(CONSERVATORY);
+	}
+	
+	public void addWall(int x, int y) {
+		board[x][y] = new Wall();		
+	}
+	public void addHallway(int x, int y) {
+		board[x][y] = new Hallway(new Coordinate(x, y));
+	}
+	public void addRoom(int x, int y, int room){
+		board[x][y] = roomList.get(room);
+	}
+	
+	public void printBoard(){
+		for (int i = 0; i < board[0].length; i++){
+			for (int j = 0; j < board.length; j++){
+				boolean isPlayer = false;
+				for (Player p: playerList){
+					if (p.at(new Coordinate(j, i))){
+						System.out.print("P");
+						isPlayer = true;
+					}
+				}
+				if (!isPlayer){
+					if (board[j][i] instanceof Wall){
+						System.out.print("W");
+					} else if (board[j][i] instanceof Room){
+						System.out.print("E");
+					} else if (board[j][i] instanceof Hallway){
+						System.out.print(" ");
+					}
+				}
+			}
+			System.out.println("");
+		}
+	}
+	
+	public boolean[][] aStarBoard(){
+		boolean[][] aStarBoard = new boolean[board.length][board[0].length];
+		for (int i = 0; i < board[0].length; i++){
+			for (int j = 0; j < board.length; j++){
+				if (board[j][i] instanceof Hallway || board[j][i] instanceof Room){
+					aStarBoard[j][i] = true;
+				} else {
+					aStarBoard[j][i] = false;
+				}
+			}
+		}
+		for (Player p: playerList){
+			Coordinate loc = p.getCoords();
+			aStarBoard[loc.getX()][loc.getY()] = false;
+		}
+		
+		
+		return aStarBoard;
+	}
+
+}
