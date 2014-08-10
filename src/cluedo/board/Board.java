@@ -18,7 +18,7 @@ public class Board {
 	public static final int NOTHING = 0;
 	public static final int SUCCESS = 7;
 	public static final int INVALIDCARD = 8;
-	public static final int NEXTTURN = 9;
+	//public static final int NEXTTURN = 9; Not used atm. Perhaps there will be a use for it
 	
 	//Characters
 	public static final int SCARLETT = 1;
@@ -55,7 +55,7 @@ public class Board {
 	private int currentPlayer;
 	private int currentMove;
 	private int currentSuggest;		//Current set of cards being suggested
-	private int refutePlayer;		//Used for when going around to refute a suggestion/accusition
+	private int refutePlayer;		//Used for when going around to refute a suggestion/accusation
 	private int currentAccuse;		//Current set of cards being accused
 	private boolean[][] aStarBoard;
 	
@@ -77,7 +77,8 @@ public class Board {
 	}
 	
 	/*
-	 * Sets the number of players, sorts players into order, sets current player, creates new "Can go" map, sets state to first state. 
+	 * Sets the number of players, sorts players into order, sets current player 
+	 * creates new "Can go" map, sets state to first state. 
 	 */
 	@SuppressWarnings("unchecked")
 	public boolean startGame(){
@@ -95,6 +96,7 @@ public class Board {
 		return playerList.get(currentPlayer).getChar();
 	}
 	
+	//This may be confusing, but was mainly used for testing purposes. Please ignore.
 	public Player getCurrentPlayer(){
 		return playerList.get(currentPlayer);
 	}
@@ -118,6 +120,10 @@ public class Board {
 		return false;
 	}
 	
+	/*
+	 * Suggest mechanism, suggest an ENUM combination (3 numbers). Returns true if it's valid to suggest at the time
+	 * else returns false if invalid. CAN ONLY SUGGEST IN STATE 2 -AFTER- the movement.
+	 */
 	public boolean suggest(int suggestion){
 		if (currentState == 2){
 			this.currentSuggest = suggestion;
@@ -127,13 +133,16 @@ public class Board {
 		}
 		return false;
 	}
-	
+	/*
+	 * Refuting mechanism. Will take a card ENUM, and return a NOTHING if the player refuted nothing (passing)
+	 * or the card ENUM if the refute is successful, or SUCCESS if the player's suggestion goes through.
+	 */
 	public int refute(int cardNum){
 		if (cardNum == 0) {
 			moveRefute();
 			if (refutePlayer == currentPlayer){
 				nextTurn();
-				return NEXTTURN;
+				return SUCCESS;
 			}
 			return NOTHING;
 		}
@@ -152,7 +161,7 @@ public class Board {
 		moveRefute();
 		if (refutePlayer == currentPlayer){
 			nextTurn();
-			return NEXTTURN;
+			return SUCCESS;
 		}
 		return INVALIDCARD;
 	}
@@ -163,16 +172,16 @@ public class Board {
 		currentState = 0;
 	}
 	
-	//Moves the variable to the next player/state
-	public void moveRefute(){
+	//Moves the variable to the next player/state. Again should only be called by Board
+	private void moveRefute(){
 		refutePlayer = (refutePlayer + 1) % numPlayers;
 	}
 	
-	public void moveState(){
+	private void moveState(){
 		currentState = (currentState + 1) % 4;
 	}
 	
-	public void movePlayer(){
+	private void movePlayer(){
 		currentPlayer = (currentPlayer + 1) % numPlayers;
 	}
 	
@@ -314,7 +323,7 @@ public class Board {
 		}
 	}
 	
-	public boolean[][] aStarBoard(){
+	private boolean[][] aStarBoard(){
 		boolean[][] aStarBoard = new boolean[board.length][board[0].length];
 		for (int i = 0; i < board[0].length; i++){
 			for (int j = 0; j < board.length; j++){
