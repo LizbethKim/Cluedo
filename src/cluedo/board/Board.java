@@ -49,8 +49,10 @@ public class Board {
 
 	
 	private Square[][] board;
-	private List<Room> roomList = new ArrayList<Room>();
-	private List<Player> playerList = new ArrayList<Player>();
+	private List<Room> roomList;
+	private List<Coordinate> roomCoords;
+	private List<Player> playerList;
+	private List<Player> charList;
 	private int numPlayers;
 	private int currentPlayer;
 	private int currentMove;
@@ -71,9 +73,14 @@ public class Board {
 	public Board(int x, int y){
 		board = new Square[x][y];
 		currentState = -1;
-		generateRoomList();
 		currentSuggest = 0;
 		currentAccuse = 0;
+		roomList = new ArrayList<Room>();
+		playerList = new ArrayList<Player>();
+		charList = new ArrayList<Player>();
+		roomCoords = new ArrayList<Coordinate>();
+		generateRoomCoords();
+		generateRoomList();
 	}
 	
 	/*
@@ -84,6 +91,19 @@ public class Board {
 	public boolean startGame(){
 		if (currentState != -1) return false;
 		Collections.sort(playerList);
+		for (int i = 1; i < 7; i++){
+			boolean exists = false;
+			for (Player p:playerList){
+				if (p.getChar() == i){
+					exists = true;
+					charList.add(p);
+					break;
+				}
+			}
+			if (!exists){
+				charList.add(addPlayer(i, false));
+			}
+		}
 		numPlayers = playerList.size()-1;
 		currentState = 0;
 		currentPlayer = 0;
@@ -99,6 +119,20 @@ public class Board {
 	//This may be confusing, but was mainly used for testing purposes. Please ignore.
 	public Player getCurrentPlayer(){
 		return playerList.get(currentPlayer);
+	}
+	
+	//Returns a list of Coordinates of each room
+	public List<Coordinate> getRoomCoords(){
+		return roomCoords;
+	}
+	
+	//Returns the list of cards a player currently possesses as ENUMs
+	public List<Integer> getPlayerCards(){
+		List<Integer> playerCards = new ArrayList<Integer>();
+		for (Card c:playerList.get(currentPlayer).getCards()){
+			playerCards.add(c.getCard());
+		}
+		return playerCards;
 	}
 	
 	//Must ensure Player's room is set correctly before attempting this 
@@ -120,19 +154,49 @@ public class Board {
 		return false;
 	}
 	
+	
+	//Returns the current suggest attempt
+	public int currentSuggest(){
+		if (currentState == 2 || currentState == 3) {return currentSuggest;}
+		return NOTHING;
+	}
+	
 	/*
 	 * Suggest mechanism, suggest an ENUM combination (3 numbers). Returns true if it's valid to suggest at the time
 	 * else returns false if invalid. CAN ONLY SUGGEST IN STATE 2 -AFTER- the movement.
 	 */
 	public boolean suggest(int suggestion){
 		if (currentState == 2){
-			this.currentSuggest = suggestion;
-			refutePlayer = currentPlayer + 1;
-			moveState();
-			return true;
+			//Ensure that the suggestion is valid
+			if (findRoom(suggestion) >= 100 && findRoom(suggestion) <= 900 && findWeapon(suggestion) >= 10 && findWeapon(suggestion) <= 60 && findChar(suggestion) >= 1 && findChar(suggestion) <= 6){
+				Player accused = getPlayer(findChar(suggestion));
+				Room accusedRoom = getRoom(findRoom(suggestion));
+				accused.setCoords(accusedRoom.getExits().get(0));
+				accused.setRoom(findRoom(suggestion));
+				this.currentSuggest = suggestion;
+				refutePlayer = currentPlayer + 1;
+				moveState();
+				return true;
+			}
 		}
 		return false;
 	}
+	
+	//For automating retrieving things from lists
+	private Player getPlayer(int character){
+		for (Player p:charList){
+			if (p.getChar() == character) return p;
+		}
+		return null;
+	}
+	private Room getRoom(int room){
+		for (Room r:roomList){
+			if (r.getName() == room) return r;
+		}
+		return null;
+	}
+	
+	
 	/*
 	 * Refuting mechanism. Will take a card ENUM, and return a NOTHING if the player refuted nothing (passing)
 	 * or the card ENUM if the refute is successful, or SUCCESS if the player's suggestion goes through.
@@ -222,26 +286,61 @@ public class Board {
 		} else {
 			switch(chara){
 				case SCARLETT:
-					playerList.add(new Player(SCARLETT, 7, 24));
+					playerList.add(new Player(SCARLETT, 7, 24, true));
 					break;
 				case MUSTARD:
-					playerList.add(new Player(MUSTARD, 0, 17));
+					playerList.add(new Player(MUSTARD, 0, 17, true));
 					break;
 				case WHITE:
-					playerList.add(new Player(WHITE, 9, 0));
+					playerList.add(new Player(WHITE, 9, 0, true));
 					break;
 				case GREEN:
-					playerList.add(new Player(GREEN, 14, 0));
+					playerList.add(new Player(GREEN, 14, 0, true));
 					break;
 				case PEACOCK:
-					playerList.add(new Player(PEACOCK, 23, 6));
+					playerList.add(new Player(PEACOCK, 23, 6, true));
 					break;
 				case PLUM:
-					playerList.add(new Player(PLUM, 23, 19));
+					playerList.add(new Player(PLUM, 23, 19, true));
 					break;
 			}
 			return true;
 		}
+	}
+	
+	private Player addPlayer(int chara, boolean player){
+		if (currentState != -1){
+			return null;
+		} else {
+			switch(chara){
+				case SCARLETT:
+					return new Player(SCARLETT, 7, 24, player);
+				case MUSTARD:
+					return new Player(MUSTARD, 0, 17, player);
+				case WHITE:
+					return new Player(WHITE, 9, 0, player);
+				case GREEN:
+					return new Player(GREEN, 14, 0, player);
+				case PEACOCK:
+					return new Player(PEACOCK, 23, 6, player);
+				case PLUM:
+					return new Player(PLUM, 23, 19, player);
+			}
+			return null;
+		}
+	}
+	
+	private void generateRoomCoords(){
+		roomCoords.add(new Coordinate(0, 0)); //Skipping 0 for aesthetics purposes
+		roomCoords.add(new Coordinate(2, 4));
+		roomCoords.add(new Coordinate(12, 4));
+		roomCoords.add(new Coordinate(21, 2));
+		roomCoords.add(new Coordinate(21, 10));
+		roomCoords.add(new Coordinate(21, 16));
+		roomCoords.add(new Coordinate(21, 23));
+		roomCoords.add(new Coordinate(12, 21));
+		roomCoords.add(new Coordinate(3, 21));
+		roomCoords.add(new Coordinate(3, 12));
 	}
 	
 	private void generateRoomList(){

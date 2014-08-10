@@ -11,11 +11,13 @@ public class Player implements Comparable{
 	private Coordinate coords;
 	private List<Card> cards;
 	private int room;
+	private boolean playable;
 	
-	public Player(int character, int x, int y){
+	public Player(int character, int x, int y, boolean playable){
 		this.character = character;
 		coords = new Coordinate(x, y);
 		room = Board.NOTHING;
+		this.playable = playable;
 	}
 	
 	public int getChar(){
