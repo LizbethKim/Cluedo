@@ -65,6 +65,7 @@ public class CluedoUI extends JFrame implements MouseListener {
 		characters.put(Board.GREEN, "Rev Green");
 		characters.put(Board.PEACOCK, "Miss Peacock");
 		characters.put(Board.PLUM, "Professor Plum");
+		players = new HashMap<String, Integer>();
 
 		// Set up the menus
 		JMenuBar menuBar = new JMenuBar();
@@ -207,7 +208,7 @@ public class CluedoUI extends JFrame implements MouseListener {
 		int result = JOptionPane.showConfirmDialog(null, panel, "Welcome to Cluedo!", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 		System.out.println(comboBox.getSelectedItem());	// TODO
 		if (result == JOptionPane.OK_OPTION) {
-			SelectPlayers s = new SelectPlayers(characters, players, (int)comboBox.getSelectedItem());
+			SelectPlayerDialog s = new SelectPlayerDialog(this, characters, players, (int)comboBox.getSelectedItem());
 		}
 	}
 
