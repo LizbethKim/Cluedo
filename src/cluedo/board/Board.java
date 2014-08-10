@@ -177,7 +177,7 @@ public class Board {
 				accused.setCoords(accusedRoom.getExits().get(0));
 				accused.setRoom(findRoom(suggestion));
 				this.currentSuggest = suggestion;
-				refutePlayer = currentPlayer + 1;
+				moveRefute();
 				moveState();
 				return true;
 			}
@@ -236,6 +236,7 @@ public class Board {
 	//Starts the next turn. Should only be called by Board. 
 	public void nextTurn(){
 		movePlayer();
+		aStarBoard = aStarBoard();
 		currentState = 0;
 	}
 	
