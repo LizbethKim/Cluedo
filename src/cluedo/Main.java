@@ -13,9 +13,6 @@ public class Main {
 	public static void main(String[] args){
 		try {
 			Board board = createBoardFromFile("board.txt");
-			System.out.println(board.findRoom(512));
-			System.out.println(board.findWeapon(512));
-			System.out.println(board.findChar(512));
 			new CluedoUI(board);
 		} catch (IOException e) {e.printStackTrace();}
 		System.out.println("Populated");

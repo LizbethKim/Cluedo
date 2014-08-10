@@ -3,7 +3,10 @@ package cluedo.board;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
+import cluedo.AStar;
 import cluedo.Coordinate;
 import cluedo.models.Card;
 import cluedo.models.Hallway;
@@ -18,7 +21,7 @@ public class Board {
 	public static final int NOTHING = 0;
 	public static final int SUCCESS = 7;
 	public static final int INVALIDCARD = 8;
-	//public static final int NEXTTURN = 9; Not used atm. Perhaps there will be a use for it
+	public static final int FAIL = 9;
 	
 	//Characters
 	public static final int SCARLETT = 1;
@@ -104,7 +107,7 @@ public class Board {
 				charList.add(addPlayer(i, false));
 			}
 		}
-		numPlayers = playerList.size()-1;
+		numPlayers = playerList.size();
 		currentState = 0;
 		currentPlayer = 0;
 		refutePlayer = 0;
@@ -231,7 +234,7 @@ public class Board {
 	}
 	
 	//Starts the next turn. Should only be called by Board. 
-	private void nextTurn(){
+	public void nextTurn(){
 		movePlayer();
 		currentState = 0;
 	}
@@ -306,6 +309,93 @@ public class Board {
 			}
 			return true;
 		}
+	}
+	
+	public int move(Coordinate endPoint){
+		if (!aStarBoard[endPoint.getX()][endPoint.getY()]) return FAIL;
+		Coordinate start;
+		if (playerList.get(currentPlayer).currentRoom() != 0){
+			Room currentRoom = getRoom(playerList.get(currentPlayer).currentRoom());
+			start = bestExit(currentRoom, endPoint);
+		} else {
+			start = playerList.get(currentPlayer).getCoords();
+		}
+		AStar path = aStar(start, endPoint);
+		if (path.getLength() > currentMove) return FAIL;
+		AStar temp = path;
+		while (temp != null){
+			aStarBoard[path.getCoords().getX()][path.getCoords().getY()] = false;
+			temp = temp.getParent();
+		}
+		if (board[endPoint.getX()][endPoint.getY()] instanceof Room){
+			//Sets Player's coordinates to the middle of the Room, <3 Kelsey Please don't hate me :(
+			playerList.get(currentPlayer).setCoords(roomCoords.get(convertRoom(((Room) board[endPoint.getX()][endPoint.getY()]).getName())));
+			currentMove = 0;
+		} else {
+			currentMove -= path.getLength();
+			playerList.get(currentPlayer).setCoords(endPoint);
+		}
+		if (currentMove == 0) {
+			moveState();
+			return SUCCESS;
+		}
+		return NOTHING;
+	}
+	
+	public AStar aStar(Coordinate startPoint, Coordinate endPoint){
+		boolean[][] tempStarBoard = aStarBoard();
+		AStar root = new AStar(null, 0, getDistance(startPoint, endPoint),startPoint);
+		Queue<AStar> fringe = new PriorityQueue<AStar>();
+		fringe.add(root);
+		AStar temp = null;
+		tempStarBoard[startPoint.getX()][startPoint.getY()] = true;
+		while (!fringe.isEmpty()){
+			temp = fringe.poll();
+			Coordinate node = temp.getCoords();
+			if (!visited(node, tempStarBoard)){
+				tempStarBoard[node.getX()][node.getY()] = false;
+				if (node.equals(endPoint)){
+					return temp;
+				}
+				List<Coordinate> exits = new ArrayList<Coordinate>();
+				if (node.getX() - 1 >= 0 && tempStarBoard[node.getX()-1][node.getY()]){
+					exits.add(new Coordinate(node.getX()-1, node.getY()));
+				}
+				if (node.getX() + 1 < board.length && tempStarBoard[node.getX()+1][node.getY()]){
+					exits.add(new Coordinate(node.getX()+1, node.getY()));
+				}
+				if (node.getY() - 1 >= 0 && tempStarBoard[node.getX()][node.getY()-1]){
+					exits.add(new Coordinate(node.getX(), node.getY()-1));
+				}
+				if (node.getY() + 1 < board[0].length && tempStarBoard[node.getX()][node.getY() + 1]){
+					exits.add(new Coordinate(node.getX(), node.getY() + 1));
+				}
+				for (Coordinate c:exits){
+					fringe.add(new AStar(temp, temp.getLength() + 1, getDistance(c, endPoint), c));
+				}
+			}
+		}
+		return null;
+	}
+	
+	private boolean visited(Coordinate coords, boolean[][] aStarBoard){
+		return !(aStarBoard[coords.getX()][coords.getY()]);
+	}
+	
+	private Coordinate bestExit(Room room, Coordinate endPoint){
+		int min = Integer.MAX_VALUE;
+		Coordinate bestExit = new Coordinate(0, 0);
+		for (Coordinate exit:room.getExits()){
+			if (getDistance(exit, endPoint) < min){
+				min = getDistance(exit, endPoint);
+				bestExit = exit;
+			}
+		}
+		return bestExit;
+	}
+	
+	private int getDistance(Coordinate startPoint, Coordinate endPoint){
+		return (Math.abs(startPoint.getX() - endPoint.getX()) + Math.abs(startPoint.getY() - endPoint.getY()));
 	}
 	
 	private Player addPlayer(int chara, boolean player){

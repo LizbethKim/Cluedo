@@ -68,4 +68,5 @@ public class Room implements Square{
 	public int getPassage(){
 		return passage;
 	}
+
 }
