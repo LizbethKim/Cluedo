@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import cluedo.board.Board;
+import cluedo.ui.CluedoUI;
 
 public class Main {
 	
@@ -15,9 +16,10 @@ public class Main {
 			System.out.println(board.findRoom(512));
 			System.out.println(board.findWeapon(512));
 			System.out.println(board.findChar(512));
+			new CluedoUI(board);
 		} catch (IOException e) {e.printStackTrace();}
 		System.out.println("Populated");
-		System.exit(0);
+		//System.exit(0);
 	}
 	
 	

@@ -51,12 +51,12 @@ public class CluedoUI extends JFrame implements MouseListener {
 	private final int cardCanvasLeft = 130;
 	private final int checkPaneLeft;
 
-	//private Model game;
+	private Board game;
 	private int currentPlayer = 1;
 	private Map<Integer, String> characters;
-	private Map<String, Integer> players;
+	private Map<Integer, String> players;
 
-	public CluedoUI() {
+	public CluedoUI(Board game) {
 		super("Cluedo");
 		characters = new HashMap<Integer, String>();
 		characters.put(Board.SCARLETT, "Miss Scarlett"); 
@@ -65,11 +65,12 @@ public class CluedoUI extends JFrame implements MouseListener {
 		characters.put(Board.GREEN, "Rev Green");
 		characters.put(Board.PEACOCK, "Miss Peacock");
 		characters.put(Board.PLUM, "Professor Plum");
+		players = new HashMap<Integer, String>();
 
 		// Set up the menus
 		JMenuBar menuBar = new JMenuBar();
 		JMenu gameOptionMenu = new JMenu("Game");
-		JMenu playerOptionMenu = new JMenu("Player");
+		// JMenu playerOptionMenu = new JMenu("Player"); TODO
 		JMenuItem quit = new JMenuItem("Quit");
 		quit.addActionListener(new ActionListener() {
 			@Override
@@ -188,7 +189,6 @@ public class CluedoUI extends JFrame implements MouseListener {
 		pack();
 		setResizable(false);
 		setVisible(true);
-		// addKeyListener(this);
 		addMouseListener(this);
 
 		bottomPaneTop = canvas.getHeight() + boardCanvasTop;
@@ -205,31 +205,43 @@ public class CluedoUI extends JFrame implements MouseListener {
 		panel.add(comboBox);
 
 		int result = JOptionPane.showConfirmDialog(null, panel, "Welcome to Cluedo!", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-		System.out.println(comboBox.getSelectedItem());	// TODO
 		if (result == JOptionPane.OK_OPTION) {
-			SelectPlayers s = new SelectPlayers(characters, players, (int)comboBox.getSelectedItem());
+			SelectPlayerDialog s = new SelectPlayerDialog(this, characters, players, (int)comboBox.getSelectedItem());
+		} else {
+			// TODO cancel game?
 		}
+		for (Integer s: players.keySet()) {
+			game.addPlayer(s);
+		}
+		game.startGame();
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		// Move to a square on canvas
 		if (canvas.contains(e.getX(), e.getY() - boardCanvasTop)) {
 			int xCoord = (int) ((e.getX() - canvas.getBoardLeft()) / canvas.getSquareWidth());
 			int yCoord = (int) ((e.getY() - canvas.getBoardTop() - boardCanvasTop) / canvas.getSquareWidth());
-			canvas.highlight(new Coordinate(xCoord, yCoord));
-			canvas.repaint();
-		} else if (dicePane.contains(e.getX(), e.getY() - bottomPaneTop)) { // , y)e.getX() >= 0 && e.getX() <= dicePane.getWidth()) {
-			// TODO ask model whether dice roll is ok. if not, display message and/or ignore
+			Coordinate c = new Coordinate(xCoord, yCoord);
+			if (game.getState() == 1) {
+				//game.moveTo(c);
+			} //else if (game.getState() == 0 && something to do with middle room ) {
+				//initialise accusation!
+			//} else if (game.getState() == 0 && something something corner room) {
+				//secret passage
+			//}
+		// Dice roll
+		} else if (dicePane.contains(e.getX(), e.getY() - bottomPaneTop) && game.getState() == 0) {
 			int newRoll = dicePane.rollDice();
-			// TODO send back the roll
+			game.rollDice(newRoll);
 		}
 
 	}
 
-	public static void main(String[] args) {
-		new CluedoUI();
-
-	}
+//	public static void main(String[] args) {
+//		new CluedoUI();
+//
+//	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
