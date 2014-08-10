@@ -312,19 +312,19 @@ public class Board {
 	}
 	
 	public int move(Coordinate endPoint){
-		if (!aStarBoard[endPoint.getX()][endPoint.getY()]) return FAIL;
+		if (!aStarBoard[endPoint.getX()][endPoint.getY()]) return FAIL; //If it's impossible to move to the end position returns fail
 		Coordinate start;
 		if (playerList.get(currentPlayer).currentRoom() != 0){
-			Room currentRoom = getRoom(playerList.get(currentPlayer).currentRoom());
+			Room currentRoom = getRoom(playerList.get(currentPlayer).currentRoom()); //If player is in a room, it will automatically pick the best exit to leave to get to the position
 			start = bestExit(currentRoom, endPoint);
 		} else {
-			start = playerList.get(currentPlayer).getCoords();
+			start = playerList.get(currentPlayer).getCoords(); //Otherwise start position is the current coords
 		}
 		AStar path = aStar(start, endPoint);
-		if (path.getLength() > currentMove) return FAIL;
+		if (path.getLength() > currentMove) return FAIL; //If shortest distance to coordinate exceeds move distance, return fail
 		AStar temp = path;
 		while (temp != null){
-			aStarBoard[path.getCoords().getX()][path.getCoords().getY()] = false;
+			aStarBoard[path.getCoords().getX()][path.getCoords().getY()] = false; //Makes path taken untravellable if needing multiple moves
 			temp = temp.getParent();
 		}
 		if (board[endPoint.getX()][endPoint.getY()] instanceof Room){
@@ -332,16 +332,21 @@ public class Board {
 			playerList.get(currentPlayer).setCoords(roomCoords.get(convertRoom(((Room) board[endPoint.getX()][endPoint.getY()]).getName())));
 			currentMove = 0;
 		} else {
-			currentMove -= path.getLength();
-			playerList.get(currentPlayer).setCoords(endPoint);
+			currentMove -= path.getLength(); //Removes the distance travelled from the move pool
+			playerList.get(currentPlayer).setCoords(endPoint); //Updates player coordinates
 		}
-		if (currentMove == 0) {
+		if (currentMove == 0) { //If no more movement is possible, moves the state and returns success
 			moveState();
 			return SUCCESS;
 		}
-		return NOTHING;
+		return NOTHING; //If more movement is possible, returns 0 assuming more move commands will be given in the future.
 	}
 	
+	
+	/*
+	 * Simple A* Algorithm, returns the path if possible, else null. Should never null as all the logic
+	 * should be checked by the move command.
+	 */
 	public AStar aStar(Coordinate startPoint, Coordinate endPoint){
 		boolean[][] tempStarBoard = aStarBoard();
 		AStar root = new AStar(null, 0, getDistance(startPoint, endPoint),startPoint);
