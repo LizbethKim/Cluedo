@@ -1,0 +1,10 @@
+Click the dice to roll them at the start of your turn.
+
+If you wish to travel through a secret passage, click the room at the 
+other end instead of rolling your dice.
+
+If you wish to make an accusation, click the centre room instead of 
+rolling your dice. Accusations may happen at the beginning of a turn.
+
+Use the list down the right of the window to keep track of what you
+believe has been eliminated.

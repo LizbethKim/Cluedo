@@ -35,27 +35,27 @@ public class CardCanvas extends JPanel {
 		cardsToDisplay = new ArrayList<String>();
 		cards = new HashMap<String, Image>();
 		try {
-			cards.put("plum", ImageIO.read(new File("plum.jpg")));
-			cards.put("scarlett", ImageIO.read(new File("scarlett.jpg")));
-			cards.put("green", ImageIO.read(new File("green.jpg")));
-			cards.put("white", ImageIO.read(new File("white.jpg")));
-			cards.put("peacock", ImageIO.read(new File("peacock.jpg")));
-			cards.put("mustard", ImageIO.read(new File("mustard.jpg")));
-			cards.put("spanner", ImageIO.read(new File("spanner.jpg")));
-			cards.put("dagger", ImageIO.read(new File("dagger.jpg")));
-			cards.put("rope", ImageIO.read(new File("rope.jpg")));
-			cards.put("candlestick", ImageIO.read(new File("candlestick.jpg")));
-			cards.put("revolver", ImageIO.read(new File("revolver.jpg")));
-			cards.put("leadpipe", ImageIO.read(new File("leadpipe.jpg")));
-			cards.put("kitchen", ImageIO.read(new File("kitchen.jpg")));
-			cards.put("diningroom", ImageIO.read(new File("diningroom.jpg")));
-			cards.put("ballroom", ImageIO.read(new File("ballroom.jpg")));
-			cards.put("study", ImageIO.read(new File("study.jpg")));
-			cards.put("conservatory", ImageIO.read(new File("conservatory.jpg")));
-			cards.put("lounge", ImageIO.read(new File("lounge.jpg")));
-			cards.put("billiardroom", ImageIO.read(new File("billiardroom.jpg")));
-			cards.put("library", ImageIO.read(new File("library.jpg")));
-			cards.put("hall", ImageIO.read(new File("hall.jpg")));
+			cards.put("plum", ImageIO.read(new File("assets/plum.jpg")));
+			cards.put("scarlett", ImageIO.read(new File("assets/scarlett.jpg")));
+			cards.put("green", ImageIO.read(new File("assets/green.jpg")));
+			cards.put("white", ImageIO.read(new File("assets/white.jpg")));
+			cards.put("peacock", ImageIO.read(new File("assets/peacock.jpg")));
+			cards.put("mustard", ImageIO.read(new File("assets/mustard.jpg")));
+			cards.put("spanner", ImageIO.read(new File("assets/spanner.jpg")));
+			cards.put("dagger", ImageIO.read(new File("assets/dagger.jpg")));
+			cards.put("rope", ImageIO.read(new File("assets/rope.jpg")));
+			cards.put("candlestick", ImageIO.read(new File("assets/candlestick.jpg")));
+			cards.put("revolver", ImageIO.read(new File("assets/revolver.jpg")));
+			cards.put("leadpipe", ImageIO.read(new File("assets/leadpipe.jpg")));
+			cards.put("kitchen", ImageIO.read(new File("assets/kitchen.jpg")));
+			cards.put("diningroom", ImageIO.read(new File("assets/diningroom.jpg")));
+			cards.put("ballroom", ImageIO.read(new File("assets/ballroom.jpg")));
+			cards.put("study", ImageIO.read(new File("assets/study.jpg")));
+			cards.put("conservatory", ImageIO.read(new File("assets/conservatory.jpg")));
+			cards.put("lounge", ImageIO.read(new File("assets/lounge.jpg")));
+			cards.put("billiardroom", ImageIO.read(new File("assets/billiardroom.jpg")));
+			cards.put("library", ImageIO.read(new File("assets/library.jpg")));
+			cards.put("hall", ImageIO.read(new File("assets/hall.jpg")));
 
 		} catch (IOException e) {
 			System.out.println(e);

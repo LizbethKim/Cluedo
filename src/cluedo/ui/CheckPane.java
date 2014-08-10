@@ -13,12 +13,13 @@ import java.util.Map;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
+
+@SuppressWarnings("serial")
 public class CheckPane extends JPanel {
 	
 	private String[] cardNames = { "Professor Plum", "Colonel Mustard", "Miss Scarlett", "Mrs White", "Rev Green", "Miss Peacock", "Spanner", "Dagger", "Rope", "Candlestick", "Revolver", "Lead Pipe", "Kitchen", "Dining Room", "Ballroom", "Study", "Conservatory", "Lounge", "Billiard Room", "Library", "Hall" };
@@ -31,7 +32,7 @@ public class CheckPane extends JPanel {
 		// create and populate the map for players' lists
 		lists = new HashMap<Integer, JList>();
 		for (int i = 1; i < 7; i++) {
-			final JList list = new JList(createData(cardNames));
+			final JList<CheckableItem> list = new JList<CheckableItem>(createData(cardNames));
 			list.setCellRenderer(new CheckListRenderer());
 			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			//list.setBorder(new EmptyBorder(0, 4, 0, 0));
@@ -56,7 +57,7 @@ public class CheckPane extends JPanel {
 	}
 
 	/**
-	 * Allows you to change the checklist shown depending whose turn it is.
+	 * Allows you to change the check list shown depending whose turn it is.
 	 * @param player The current player whose list should display
 	 */
 	public void setPlayer(int player) {
@@ -109,7 +110,8 @@ public class CheckPane extends JPanel {
 		return new Dimension(200,700);
 	}
     
-    private class CheckListRenderer extends JCheckBox implements ListCellRenderer {
+    
+	private class CheckListRenderer extends JCheckBox implements ListCellRenderer {
 
         public CheckListRenderer() {
           setBackground(UIManager.getColor("List.textBackground"));

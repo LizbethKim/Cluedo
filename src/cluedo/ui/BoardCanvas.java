@@ -49,7 +49,7 @@ public class BoardCanvas extends JPanel{
 		// TODO position players initially
 		// TODO position weapons
 		try {
-		    boardPic = ImageIO.read(new File("board.jpg"));
+		    boardPic = ImageIO.read(new File("assets/board.jpg"));
 		} catch (IOException e) {
 			System.out.println(e);
 		}

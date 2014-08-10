@@ -30,6 +30,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import cluedo.Coordinate;
+import cluedo.board.Board;
 
 
 /**
@@ -58,12 +59,12 @@ public class CluedoUI extends JFrame implements MouseListener {
 	public CluedoUI() {
 		super("Cluedo");
 		characters = new HashMap<Integer, String>();
-		characters.put(1, "Miss Scarlett"); // TODO replace 1 with game.SCARLETT
-		characters.put(2, "Colonel Mustard");
-		characters.put(3, "Mrs White");
-		characters.put(4, "Rev Green");
-		characters.put(5, "Miss Peacock");
-		characters.put(6, "Professor Plum");
+		characters.put(Board.SCARLETT, "Miss Scarlett"); 
+		characters.put(Board.MUSTARD, "Colonel Mustard");
+		characters.put(Board.WHITE, "Mrs White");
+		characters.put(Board.GREEN, "Rev Green");
+		characters.put(Board.PEACOCK, "Miss Peacock");
+		characters.put(Board.PLUM, "Professor Plum");
 
 		// Set up the menus
 		JMenuBar menuBar = new JMenuBar();
@@ -151,7 +152,6 @@ public class CluedoUI extends JFrame implements MouseListener {
 		cardCanvas.updateCards(init); // TODO delete
 
 		JButton endTurn = new JButton("End Turn");
-		// endTurn.setPreferredSize(new Dimension ());
 		endTurn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -206,7 +206,9 @@ public class CluedoUI extends JFrame implements MouseListener {
 
 		int result = JOptionPane.showConfirmDialog(null, panel, "Welcome to Cluedo!", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 		System.out.println(comboBox.getSelectedItem());	// TODO
-
+		if (result == JOptionPane.OK_OPTION) {
+			SelectPlayers s = new SelectPlayers(characters, players, (int)comboBox.getSelectedItem());
+		}
 	}
 
 	@Override
