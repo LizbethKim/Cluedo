@@ -25,7 +25,7 @@ import javax.swing.JTextField;
  */
 @SuppressWarnings("serial")
 public class SelectPlayerDialog extends JDialog implements ActionListener {	
-	private Map<String, Integer> playerInfo;
+	private Map<Integer, String> playerInfo;
 	private Map<Integer, String> characters;
 	private Map<String, ButtonRow> buttons;
 
@@ -34,7 +34,7 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 	private String selectedPlayer = "Miss Scarlett"; 
 	private int leftToChoose;
 
-	public SelectPlayerDialog(JFrame f, Map<Integer, String> characters, Map<String, Integer> playerInfo, int numPlayers) {
+	public SelectPlayerDialog(JFrame f, Map<Integer, String> characters, Map<Integer, String> playerInfo, int numPlayers) {
 		super(f, "Select a Character");
 		this.characters = characters;
 		this.playerInfo = playerInfo;
@@ -92,7 +92,7 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 							character = i;
 						}
 					}
-				playerInfo.put(text, character);
+				playerInfo.put(character, text);
 				leftToChoose--;
 				buttons.get(selectedPlayer).greyOut();
 				if (leftToChoose <= 0) {
