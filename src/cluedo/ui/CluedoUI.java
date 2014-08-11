@@ -35,9 +35,9 @@ import cluedo.board.Board;
 
 /**
  * The main window of the UI for the game. Also has control responsibilities.
- * 
+ *
  * @author kelsey
- * 
+ *
  */
 public class CluedoUI extends JFrame implements MouseListener {
 
@@ -60,7 +60,7 @@ public class CluedoUI extends JFrame implements MouseListener {
 		super("Cluedo");
 		this.game = game;
 		characters = new HashMap<Integer, String>();
-		characters.put(Board.SCARLETT, "Miss Scarlett"); 
+		characters.put(Board.SCARLETT, "Miss Scarlett");
 		characters.put(Board.MUSTARD, "Colonel Mustard");
 		characters.put(Board.WHITE, "Mrs White");
 		characters.put(Board.GREEN, "Rev Green");
@@ -140,7 +140,7 @@ public class CluedoUI extends JFrame implements MouseListener {
 		setJMenuBar(menuBar);
 
 		// set up the canvases and panes
-		canvas = new BoardCanvas(false); // create canvas
+		canvas = new BoardCanvas(false, game); // create canvas
 		cardCanvas = new CardCanvas();
 		dicePane = new DicePane();
 		list = new CheckPane();
@@ -227,7 +227,7 @@ public class CluedoUI extends JFrame implements MouseListener {
 			int yCoord = (int) ((e.getY() - canvas.getBoardTop() - boardCanvasTop) / canvas.getSquareWidth());
 			Coordinate c = new Coordinate(xCoord, yCoord);
 			if (game.getState() == 1) {
-				//game.moveTo(c);
+				game.move(c);
 			} //else if (game.getState() == 0 && something to do with middle room ) {
 				//initialise accusation!
 			//} else if (game.getState() == 0 && something something corner room) {
