@@ -24,6 +24,10 @@ public class Player implements Comparable{
 		return character;
 	}
 	
+	public void remove(){
+		playable = false;
+	}
+	
 	public List<Card> getCards(){
 		return cards;
 	}

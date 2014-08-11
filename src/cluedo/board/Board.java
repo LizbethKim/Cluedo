@@ -57,6 +57,7 @@ public class Board {
 	private List<Player> playerList;
 	private List<Player> charList;
 	private int numPlayers;
+	private int solution;
 	private int currentPlayer;
 	private int currentMove;
 	private int currentSuggest;		//Current set of cards being suggested
@@ -70,6 +71,7 @@ public class Board {
 	 * 1 = Move
 	 * 2 = Suggest/Accuse
 	 * 3 = Refute
+	 * 5 = Game is over
 	 */
 	private int currentState;
 	
@@ -192,14 +194,19 @@ public class Board {
 		return false;
 	}
 	
-	public boolean accuse(int suggestion){
+	public int accuse(int suggestion){
 		if (currentState == 0 || currentState == 2){
 			if (findRoom(suggestion) >= 100 && findRoom(suggestion) <= 900 && findWeapon(suggestion) >= 10 && findWeapon(suggestion) <= 60 && findChar(suggestion) >= 1 && findChar(suggestion) <= 6){
-				Player accused = getPlayer(findChar(suggestion));
-				Room accusedRoom = getRoom(findRoom(suggestion));
-
+				if (suggestion == solution){
+					currentState = 5;
+					return SUCCESS;
+				}
+				playerList.get(currentPlayer).remove();
+				return FAIL;
 			}
+			return NOTHING;
 		}
+		return NOTHING;
 	}
 	
 	//For automating retrieving things from lists
