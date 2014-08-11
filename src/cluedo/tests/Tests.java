@@ -64,6 +64,18 @@ public class Tests {
 		assertTrue(board.move(new Coordinate(7, 23)) == 0); //0 is the NOTHING enum, means there's still more moves to go.
 	}
 	
+	@Test
+	public void listSync(){
+		Board board = makeBoard();
+		board.addPlayer(1);
+		board.addPlayer(3);
+		board.startGame();
+		Player cur = board.getCurrentPlayer();
+		assertTrue(cur.getCoords().equals(board.getPlayerCoords(1)));
+		board.nextTurn();
+		cur = board.getCurrentPlayer();
+		assertTrue(cur.getCoords().equals(board.getPlayerCoords(3)));
+	}
 	
 	
 	

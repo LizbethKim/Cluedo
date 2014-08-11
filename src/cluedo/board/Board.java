@@ -94,6 +94,7 @@ public class Board {
 	public boolean startGame(){
 		if (currentState != -1) return false;
 		Collections.sort(playerList);
+		charList.add(new Player(0, 0, 0, false));
 		for (int i = 1; i < 7; i++){
 			boolean exists = false;
 			for (Player p:playerList){
@@ -115,8 +116,14 @@ public class Board {
 		return true;
 	}
 	
+	//Returns the character ENUM for the current player
 	public int currentPlayer(){
 		return playerList.get(currentPlayer).getChar();
+	}
+	
+	//Returns the player coords of the player ENUM
+	public Coordinate getPlayerCoords(int player){
+		return charList.get(player).getCoords();
 	}
 	
 	//This may be confusing, but was mainly used for testing purposes. Please ignore.
@@ -174,7 +181,7 @@ public class Board {
 			if (findRoom(suggestion) >= 100 && findRoom(suggestion) <= 900 && findWeapon(suggestion) >= 10 && findWeapon(suggestion) <= 60 && findChar(suggestion) >= 1 && findChar(suggestion) <= 6){
 				Player accused = getPlayer(findChar(suggestion));
 				Room accusedRoom = getRoom(findRoom(suggestion));
-				accused.setCoords(accusedRoom.getExits().get(0));
+				accused.setCoords(roomCoords.get(convertRoom(suggestion)));
 				accused.setRoom(findRoom(suggestion));
 				this.currentSuggest = suggestion;
 				moveRefute();
@@ -183,6 +190,16 @@ public class Board {
 			}
 		}
 		return false;
+	}
+	
+	public boolean accuse(int suggestion){
+		if (currentState == 0 || currentState == 2){
+			if (findRoom(suggestion) >= 100 && findRoom(suggestion) <= 900 && findWeapon(suggestion) >= 10 && findWeapon(suggestion) <= 60 && findChar(suggestion) >= 1 && findChar(suggestion) <= 6){
+				Player accused = getPlayer(findChar(suggestion));
+				Room accusedRoom = getRoom(findRoom(suggestion));
+
+			}
+		}
 	}
 	
 	//For automating retrieving things from lists
