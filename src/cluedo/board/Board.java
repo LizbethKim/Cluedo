@@ -223,6 +223,21 @@ public class Board {
 	}
 	
 	
+	//If not given an argument, getRoom() returns the room of the current player. ENUM of room or NOTHING
+	public int getRoom(){
+		return playerList.get(currentPlayer).currentRoom();
+	}
+	
+	//If given coords, checks whether that's a room and returns the room's ENUM or NOTHING
+	public int getRoom(Coordinate coord){
+		if (board[coord.getX()][coord.getY()] instanceof Room){
+			return ((Room) board[coord.getX()][coord.getY()]).getName();
+		} else {
+			return NOTHING;
+		}
+	}
+	
+	
 	/*
 	 * Refuting mechanism. Will take a card ENUM, and return a NOTHING if the player refuted nothing (passing)
 	 * or the card ENUM if the refute is successful, or SUCCESS if the player's suggestion goes through. If it's
@@ -340,6 +355,10 @@ public class Board {
 			start = bestExit(currentRoom, endPoint);
 		} else {
 			start = playerList.get(currentPlayer).getCoords(); //Otherwise start position is the current coords
+		}
+		if (board[endPoint.getX()][endPoint.getY()] instanceof Room){
+			Room endRoom = (Room) board[endPoint.getX()][endPoint.getY()];
+			endPoint = bestExit(endRoom, start);
 		}
 		AStar path = aStar(start, endPoint);
 		if (path.getLength() > currentMove) return FAIL; //If shortest distance to coordinate exceeds move distance, return fail
