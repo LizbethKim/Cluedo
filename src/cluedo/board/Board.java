@@ -312,6 +312,7 @@ public class Board {
 	public boolean rollDice(int roll){
 		if (currentState == 0) {
 			currentMove = roll;
+			moveState();
 			return true;
 		}
 		return false;
