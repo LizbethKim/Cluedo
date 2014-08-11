@@ -71,5 +71,13 @@ public class Player implements Comparable{
 	public void setCoords(Coordinate coordinate) {
 		this.coords = coordinate;
 	}
+
+	public boolean playable() {
+		return playable;
+	}
+
+	public void add() {
+		playable = true;
+	}
 	
 }

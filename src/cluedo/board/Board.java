@@ -84,9 +84,22 @@ public class Board {
 		playerList = new ArrayList<Player>();
 		charList = new ArrayList<Player>();
 		roomCoords = new ArrayList<Coordinate>();
+		populateCharList();
 		generateRoomCoords();
 		generateRoomList();
 	}
+	
+	public int getMovesLeft(){
+		return currentMove;
+	}
+	
+	private void populateCharList(){
+		charList.add(new Player(0, 0, 0, false));
+		for (int i = 1; i < 7; i++){
+			charList.add(addPlayer(i, false));
+		}
+	}
+
 	
 	/*
 	 * Sets the number of players, sorts players into order, sets current player 
@@ -96,20 +109,6 @@ public class Board {
 	public boolean startGame(){
 		if (currentState != -1) return false;
 		Collections.sort(playerList);
-		charList.add(new Player(0, 0, 0, false));
-		for (int i = 1; i < 7; i++){
-			boolean exists = false;
-			for (Player p:playerList){
-				if (p.getChar() == i){
-					exists = true;
-					charList.add(p);
-					break;
-				}
-			}
-			if (!exists){
-				charList.add(addPlayer(i, false));
-			}
-		}
 		numPlayers = playerList.size();
 		currentState = 0;
 		currentPlayer = 0;
@@ -198,7 +197,7 @@ public class Board {
 		if (currentState == 0 || currentState == 2){
 			if (findRoom(suggestion) >= 100 && findRoom(suggestion) <= 900 && findWeapon(suggestion) >= 10 && findWeapon(suggestion) <= 60 && findChar(suggestion) >= 1 && findChar(suggestion) <= 6){
 				if (suggestion == solution){
-					currentState = 5;
+					gameEnd();
 					return SUCCESS;
 				}
 				playerList.get(currentPlayer).remove();
@@ -226,9 +225,11 @@ public class Board {
 	
 	/*
 	 * Refuting mechanism. Will take a card ENUM, and return a NOTHING if the player refuted nothing (passing)
-	 * or the card ENUM if the refute is successful, or SUCCESS if the player's suggestion goes through.
+	 * or the card ENUM if the refute is successful, or SUCCESS if the player's suggestion goes through. If it's
+	 * not the correct state to refute, returns FAIL
 	 */
 	public int refute(int cardNum){
+		if (currentState != 3) return FAIL;
 		if (cardNum == 0) {
 			moveRefute();
 			if (refutePlayer == currentPlayer){
@@ -259,9 +260,21 @@ public class Board {
 	
 	//Starts the next turn. Should only be called by Board. 
 	public void nextTurn(){
+		if (currentState == 5) return;
+		int tempCurrentPlayer = currentPlayer;
 		movePlayer();
+		while (!playerList.get(currentPlayer).playable() && currentPlayer != tempCurrentPlayer){
+			movePlayer();
+		}
+		if (currentPlayer == tempCurrentPlayer && !playerList.get(currentPlayer).playable()){
+			gameEnd();
+		}
 		aStarBoard = aStarBoard();
 		currentState = 0;
+	}
+	
+	public void gameEnd(){
+		currentState = 5;
 	}
 	
 	//Moves the variable to the next player/state. Again should only be called by Board
@@ -312,26 +325,8 @@ public class Board {
 		if (currentState != -1){
 			return false;
 		} else {
-			switch(chara){
-				case SCARLETT:
-					playerList.add(new Player(SCARLETT, 7, 24, true));
-					break;
-				case MUSTARD:
-					playerList.add(new Player(MUSTARD, 0, 17, true));
-					break;
-				case WHITE:
-					playerList.add(new Player(WHITE, 9, 0, true));
-					break;
-				case GREEN:
-					playerList.add(new Player(GREEN, 14, 0, true));
-					break;
-				case PEACOCK:
-					playerList.add(new Player(PEACOCK, 23, 6, true));
-					break;
-				case PLUM:
-					playerList.add(new Player(PLUM, 23, 19, true));
-					break;
-			}
+			playerList.add(charList.get(chara));
+			charList.get(chara).add();
 			return true;
 		}
 	}
