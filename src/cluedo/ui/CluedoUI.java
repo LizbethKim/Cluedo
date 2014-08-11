@@ -99,7 +99,7 @@ public class CluedoUI extends JFrame implements MouseListener {
 					JFrame ruleWindow = new JFrame();
 					ruleWindow.setPreferredSize(new Dimension(620, 700));
 					ruleWindow.setLayout(new BorderLayout());
-					String text = new Scanner(new File("rules.txt")).useDelimiter("\\Z").next();
+					String text = new Scanner(new File("assets/rules.txt")).useDelimiter("\\Z").next();
 					JTextArea ta = new JTextArea(text);
 					JScrollPane sp = new JScrollPane(ta);
 					ruleWindow.add(sp, BorderLayout.CENTER);
@@ -120,7 +120,7 @@ public class CluedoUI extends JFrame implements MouseListener {
 					JFrame ruleWindow = new JFrame();
 					ruleWindow.setPreferredSize(new Dimension(450, 400));
 					ruleWindow.setLayout(new BorderLayout());
-					String text = new Scanner(new File("help.txt")).useDelimiter("\\Z").next();
+					String text = new Scanner(new File("assets/help.txt")).useDelimiter("\\Z").next();
 					JTextArea ta = new JTextArea(text);
 					JScrollPane sp = new JScrollPane(ta);
 					ruleWindow.add(sp, BorderLayout.CENTER);
