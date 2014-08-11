@@ -58,6 +58,7 @@ public class CluedoUI extends JFrame implements MouseListener {
 
 	public CluedoUI(Board game) {
 		super("Cluedo");
+		this.game = game;
 		characters = new HashMap<Integer, String>();
 		characters.put(Board.SCARLETT, "Miss Scarlett"); 
 		characters.put(Board.MUSTARD, "Colonel Mustard");
@@ -219,6 +220,8 @@ public class CluedoUI extends JFrame implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// Move to a square on canvas
+		System.out.println(game);
+		System.out.println(dicePane);
 		if (canvas.contains(e.getX(), e.getY() - boardCanvasTop)) {
 			int xCoord = (int) ((e.getX() - canvas.getBoardLeft()) / canvas.getSquareWidth());
 			int yCoord = (int) ((e.getY() - canvas.getBoardTop() - boardCanvasTop) / canvas.getSquareWidth());
