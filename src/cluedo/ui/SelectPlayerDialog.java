@@ -18,20 +18,20 @@ import javax.swing.JTextField;
 
 /**
  * The dialog at the start of the game to choose characters.
- * Takes a map from String to Integer and populates it with 
+ * Takes a map from String to Integer and populates it with
  * player names and the corresponding character chosen.
  * @author kelsey
  *
  */
 @SuppressWarnings("serial")
-public class SelectPlayerDialog extends JDialog implements ActionListener {	
+public class SelectPlayerDialog extends JDialog implements ActionListener {
 	private Map<Integer, String> playerInfo;
 	private Map<Integer, String> characters;
 	private Map<String, ButtonRow> buttons;
 
 	private ButtonGroup group;
 	private JPanel whole;
-	private String selectedPlayer = "Miss Scarlett"; 
+	private String selectedPlayer = "Miss Scarlett";
 	private int leftToChoose;
 
 	public SelectPlayerDialog(JFrame f, Map<Integer, String> characters, Map<Integer, String> playerInfo, int numPlayers) {
@@ -40,7 +40,7 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 		this.playerInfo = playerInfo;
 		leftToChoose = numPlayers;
 		this.buttons = new HashMap<String, ButtonRow>();
-		
+
 		for (int i = 1; i < 7; i++) {
 			buttons.put(characters.get(i), new ButtonRow(characters.get(i)));
 		}
@@ -49,20 +49,20 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 	    JButton okButton = new JButton("OK");
 	    okButton.setActionCommand("ok");
 	    okButton.setPreferredSize(new Dimension(100, 23));
-	    
+
 	    group = new ButtonGroup();
 	    for (ButtonRow br: buttons.values()) {
 	    	group.add(br.b);
 	    }
-	    
+
 	    okButton.addActionListener(this);
-	    
+
 	    JPanel okPanel = new JPanel();
 	    okPanel.setPreferredSize(new Dimension(400, 25));
 	    okPanel.setLayout(new BorderLayout());
 	    okPanel.add(okButton, BorderLayout.CENTER);
-	    
-	    
+
+
 	    whole = new JPanel();
 	    whole.setLayout(new BoxLayout(whole, BoxLayout.Y_AXIS));
 	    for (ButtonRow br: buttons.values()) {
@@ -70,14 +70,14 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 	    }
 	    whole.add(okPanel);
 	    whole.setPreferredSize(new Dimension(400, 175));
-	    
+
 	    add(whole);
 	    setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		pack();
 		setResizable(false);
 		setLocationRelativeTo(f);
 		setVisible(true);
-		
+
 	}
 
 	@Override
@@ -96,9 +96,10 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 				leftToChoose--;
 				buttons.get(selectedPlayer).greyOut();
 				if (leftToChoose <= 0) {
+					CluedoUI.go = true;
 					dispose();
 				}
-				
+
 			}
 		} else {
 			buttons.get(selectedPlayer).showTextPane(false);
@@ -106,11 +107,11 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 			selectedPlayer = command;
 		}
 	}
-	
+
 	private class ButtonRow extends JPanel {
 		private JRadioButton b;
 		private JTextField text;
-		
+
 		public ButtonRow (String label) {
 			b = new JRadioButton(label);
 			b.setActionCommand(label);
@@ -122,12 +123,12 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 			text.setVisible(false);
 			add(text, BorderLayout.EAST);
 		}
-		
+
 		private void greyOut() {
 			b.setEnabled(false);
 			text.setEditable(false);
 		}
-		
+
 		private void showTextPane (boolean show) {
 			if (!b.isEnabled()) return;
 			if (!show) {
@@ -136,7 +137,7 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 			text.setVisible(show);
 			revalidate();
 		}
-		
+
 		public Dimension getPreferredSize() {
 			return new Dimension(400, 25);
 		}

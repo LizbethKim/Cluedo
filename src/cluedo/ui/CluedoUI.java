@@ -39,7 +39,7 @@ import cluedo.board.Board;
  * @author kelsey
  *
  */
-public class CluedoUI extends JFrame implements MouseListener {
+public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 
 	private BoardCanvas canvas;
 	private DicePane dicePane;
@@ -55,6 +55,8 @@ public class CluedoUI extends JFrame implements MouseListener {
 	private int currentPlayer = 1;
 	private Map<Integer, String> characters;
 	private Map<Integer, String> players;
+
+	public static boolean go;	// FIXME!!!
 
 	public CluedoUI(Board game) {
 		super("Cluedo");
@@ -140,7 +142,7 @@ public class CluedoUI extends JFrame implements MouseListener {
 		setJMenuBar(menuBar);
 
 		// set up the canvases and panes
-		canvas = new BoardCanvas(false, game); // create canvas
+		canvas = new BoardCanvas(true, game); // create canvas
 		cardCanvas = new CardCanvas();
 		dicePane = new DicePane();
 		list = new CheckPane();
@@ -154,19 +156,21 @@ public class CluedoUI extends JFrame implements MouseListener {
 		cardCanvas.updateCards(init); // TODO delete
 
 		JButton endTurn = new JButton("End Turn");
-		endTurn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO IMPORTANT END TURN HERE
-				// currentPlayer = game.endTurn();
-				list.setPlayer(0);
-				cardCanvas.updateCards(new ArrayList<String>());
-				JOptionPane.showMessageDialog(CluedoUI.this, "It's " + characters.get(currentPlayer) + "'s turn!");
-				list.setPlayer(currentPlayer);
-				// cardCanvas.updateCards(game.getCards(currentPlayer)); TODO make getCards
-
-			}
-		});
+		endTurn.setActionCommand("End Turn");
+		endTurn.addActionListener( this );
+//		new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				game.nextTurn();
+//				currentPlayer = game.currentPlayer();
+//				list.setPlayer(0);
+//				cardCanvas.updateCards(new ArrayList<String>());
+//				JOptionPane.showMessageDialog(CluedoUI.this, "It's " + characters.get(currentPlayer) + "'s turn!");
+//				list.setPlayer(currentPlayer);
+//				// cardCanvas.updateCards(game.getCards(currentPlayer)); TODO make getCards
+//
+//			}
+//		});
 
 		JPanel south = new JPanel();
 		south.setLayout(new BorderLayout());
@@ -204,13 +208,22 @@ public class CluedoUI extends JFrame implements MouseListener {
 		model.addElement(6);
 		JComboBox<Integer> comboBox = new JComboBox<Integer>(model);
 		panel.add(comboBox);
-
+		// FIXME make no cancel option
+		//int result = JOptionPane.showMessageDialog(this, panel, "Welcome to Cluedo!", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 		int result = JOptionPane.showConfirmDialog(null, panel, "Welcome to Cluedo!", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			SelectPlayerDialog s = new SelectPlayerDialog(this, characters, players, (int)comboBox.getSelectedItem());
+			while (!this.go) {	/// TODO gah
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
 		} else {
 			// TODO cancel game?
 		}
+		// FIXME executes before dialog finishes
 		for (Integer s: players.keySet()) {
 			game.addPlayer(s);
 		}
@@ -220,14 +233,13 @@ public class CluedoUI extends JFrame implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// Move to a square on canvas
-		System.out.println(game);
-		System.out.println(dicePane);
 		if (canvas.contains(e.getX(), e.getY() - boardCanvasTop)) {
 			int xCoord = (int) ((e.getX() - canvas.getBoardLeft()) / canvas.getSquareWidth());
 			int yCoord = (int) ((e.getY() - canvas.getBoardTop() - boardCanvasTop) / canvas.getSquareWidth());
 			Coordinate c = new Coordinate(xCoord, yCoord);
 			if (game.getState() == 1) {
 				game.move(c);
+				canvas.repaint();
 			} //else if (game.getState() == 0 && something to do with middle room ) {
 				//initialise accusation!
 			//} else if (game.getState() == 0 && something something corner room) {
@@ -260,6 +272,20 @@ public class CluedoUI extends JFrame implements MouseListener {
 
 	@Override
 	public void mouseExited(MouseEvent e) {
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getActionCommand().equals("End Turn")) {
+			game.nextTurn();
+			currentPlayer = game.currentPlayer();
+			list.setPlayer(0);
+			cardCanvas.updateCards(new ArrayList<String>());
+			JOptionPane.showMessageDialog(CluedoUI.this, "It's " + characters.get(currentPlayer) + "'s turn!");
+			list.setPlayer(currentPlayer);
+			// cardCanvas.updateCards(game.getCards(currentPlayer)); TODO make getCards
+		}
+
 	}
 
 	// @Override
