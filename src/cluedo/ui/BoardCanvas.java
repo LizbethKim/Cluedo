@@ -7,6 +7,7 @@ import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import cluedo.Coordinate;
+import cluedo.board.Board;
 
 public class BoardCanvas extends JPanel{
 
@@ -28,35 +30,38 @@ public class BoardCanvas extends JPanel{
 	private Color highlightCol = new Color(0, 255, 0, 100);
 
 	private List<Coordinate> highlighted = new ArrayList<Coordinate>();
-	private Map<Integer, Coordinate> tokens;
+	//private Map<Integer, Coordinate> tokens;
 	private Map<Integer, Color> colors;
+
+	private Board game;
 	/**
 	 * @param big Whether the boards should be large or not
 	 */
-	public BoardCanvas (boolean big) {
+	public BoardCanvas (boolean big, Board game) {
+		this.game = game;
 		if (big) {
 			width = 730;
 			height = 760;
 			boardLeft = 12;
 			boardTop = 12;
-			squareWidth = 29.42;			
+			squareWidth = 29.42;
 		} else {
 			width = 630;
 			height = 656;
 			boardLeft = 11;
 			boardTop = 11;
 			squareWidth = 25.38;
-		}	
-		
-		tokens = new HashMap<Integer, Coordinate>();
+		}
+
+		//tokens = new HashMap<Integer, Coordinate>();
 		colors = new HashMap<Integer, Color>();
 		// FOR NOW TODO use a getPosition(playerInt) method
-		tokens.put(Board.SCARLETT, new Coordinate(7,24));
-		tokens.put(Board.MUSTARD, new Coordinate(0, 17));
-		tokens.put(Board.WHITE, new Coordinate(9, 0));
-		tokens.put(Board.GREEN, new Coordinate(14, 0));
-		tokens.put(Board.PEACOCK, new Coordinate(23, 6));
-		tokens.put(Board.PLUM, new Coordinate (23, 19));
+//		tokens.put(Board.SCARLETT, game.getPlayerCoords(Board.SCARLETT));
+//		tokens.put(Board.MUSTARD, game.getPlayerCoords(Board.MUSTARD));
+//		tokens.put(Board.WHITE, game.getPlayerCoords(Board.WHITE));
+//		tokens.put(Board.GREEN, game.getPlayerCoords(Board.GREEN));
+//		tokens.put(Board.PEACOCK, game.getPlayerCoords(Board.PEACOCK));
+//		tokens.put(Board.PLUM, game.getPlayerCoords(Board.PLUM));
 
 		colors.put(Board.SCARLETT, Color.red.darker());
 		colors.put(Board.MUSTARD, new Color (245,198,76));
@@ -64,7 +69,7 @@ public class BoardCanvas extends JPanel{
 		colors.put(Board.GREEN, Color.green.darker().darker());
 		colors.put(Board.PEACOCK, Color.blue);
 		colors.put(Board.PLUM, new Color(150, 50 ,255));
-		
+
 		// TODO position weapons
 		try {
 		    boardPic = ImageIO.read(new File("assets/board.jpg"));
@@ -86,23 +91,23 @@ public class BoardCanvas extends JPanel{
 //		for (double i = boardLeft; i < width; i += squareWidth) {
 //			g.drawLine((int)i, 0, (int)i, height);
 //		}
-	
+
 		g.setColor(highlightCol);
 		for (Coordinate c: highlighted) {
 			g.fillRect(boardLeft + (int)(squareWidth*c.getX()) - 1, boardTop + (int)(squareWidth*c.getY()) - 1, (int)squareWidth + 2, (int)squareWidth + 2);
 		}
-		
-		for (int chara : tokens.keySet()) {
+
+		for (int chara : colors.keySet()) {
 			g.setColor(colors.get(chara));
-			Coordinate c = tokens.get(chara);
+			Coordinate c = game.getPlayerCoords(chara);
 			g.fillOval(boardLeft + (int)(squareWidth*c.getX()) + 4, boardTop + (int)(squareWidth*c.getY()) + 4, (int)squareWidth - 8, (int)squareWidth - 8);
 		}
 
 	}
 
-	
+
 	/**
-	 * Allows squares on the board to be highlighted 
+	 * Allows squares on the board to be highlighted
 	 * @param c
 	 */
 	public void highlight(Coordinate c) {
@@ -121,7 +126,7 @@ public class BoardCanvas extends JPanel{
 	public Dimension getPreferredSize() {
 		return new Dimension(width,height);
 	}
-	
+
 	public int getBoardLeft() {
 		return boardLeft;
 	}
@@ -133,7 +138,7 @@ public class BoardCanvas extends JPanel{
 	public double getSquareWidth() {
 		return squareWidth;
 	}
-	
+
 	public int getBoardHeight() {
 		return height;
 	}
