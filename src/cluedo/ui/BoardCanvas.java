@@ -29,6 +29,7 @@ public class BoardCanvas extends JPanel{
 
 	private List<Coordinate> highlighted = new ArrayList<Coordinate>();
 	private Map<Integer, Coordinate> tokens;
+	private Map<Integer, Color> colors;
 	/**
 	 * @param big Whether the boards should be large or not
 	 */
@@ -46,7 +47,24 @@ public class BoardCanvas extends JPanel{
 			boardTop = 11;
 			squareWidth = 25.38;
 		}	
-		// TODO position players initially
+		
+		tokens = new HashMap<Integer, Coordinate>();
+		colors = new HashMap<Integer, Color>();
+		// FOR NOW TODO use a getPosition(playerInt) method
+		tokens.put(Board.SCARLETT, new Coordinate(7,24));
+		tokens.put(Board.MUSTARD, new Coordinate(0, 17));
+		tokens.put(Board.WHITE, new Coordinate(9, 0));
+		tokens.put(Board.GREEN, new Coordinate(14, 0));
+		tokens.put(Board.PEACOCK, new Coordinate(23, 6));
+		tokens.put(Board.PLUM, new Coordinate (23, 19));
+
+		colors.put(Board.SCARLETT, Color.red.darker());
+		colors.put(Board.MUSTARD, new Color (245,198,76));
+		colors.put(Board.WHITE, Color.white);
+		colors.put(Board.GREEN, Color.green.darker().darker());
+		colors.put(Board.PEACOCK, Color.blue);
+		colors.put(Board.PLUM, new Color(150, 50 ,255));
+		
 		// TODO position weapons
 		try {
 		    boardPic = ImageIO.read(new File("assets/board.jpg"));
