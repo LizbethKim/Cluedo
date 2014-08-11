@@ -91,6 +91,12 @@ public class BoardCanvas extends JPanel{
 		for (Coordinate c: highlighted) {
 			g.fillRect(boardLeft + (int)(squareWidth*c.getX()) - 1, boardTop + (int)(squareWidth*c.getY()) - 1, (int)squareWidth + 2, (int)squareWidth + 2);
 		}
+		
+		for (int chara : tokens.keySet()) {
+			g.setColor(colors.get(chara));
+			Coordinate c = tokens.get(chara);
+			g.fillOval(boardLeft + (int)(squareWidth*c.getX()) + 4, boardTop + (int)(squareWidth*c.getY()) + 4, (int)squareWidth - 8, (int)squareWidth - 8);
+		}
 
 	}
 
