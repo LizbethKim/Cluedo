@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -94,47 +95,13 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		gameOptionMenu.add(quit);
 		JMenu fileOptionMenu = new JMenu("File");
 		JMenuItem rules = new JMenuItem("Rules");
-		rules.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					JFrame ruleWindow = new JFrame();
-					ruleWindow.setPreferredSize(new Dimension(620, 700));
-					ruleWindow.setLayout(new BorderLayout());
-					String text = new Scanner(new File("assets/rules.txt")).useDelimiter("\\Z").next();
-					JTextArea ta = new JTextArea(text);
-					JScrollPane sp = new JScrollPane(ta);
-					ruleWindow.add(sp, BorderLayout.CENTER);
-					ruleWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-					ruleWindow.pack();
-					ruleWindow.setResizable(false);
-					ruleWindow.setVisible(true);
-				} catch (FileNotFoundException e) {
-					System.out.println(e);
-				}
-			}
-		});
+		rules.setActionCommand("Rules");
+		rules.addActionListener(this);
+
 		JMenuItem help = new JMenuItem("Help");
-		help.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					JFrame ruleWindow = new JFrame();
-					ruleWindow.setPreferredSize(new Dimension(450, 400));
-					ruleWindow.setLayout(new BorderLayout());
-					String text = new Scanner(new File("assets/help.txt")).useDelimiter("\\Z").next();
-					JTextArea ta = new JTextArea(text);
-					JScrollPane sp = new JScrollPane(ta);
-					ruleWindow.add(sp, BorderLayout.CENTER);
-					ruleWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-					ruleWindow.pack();
-					ruleWindow.setResizable(false);
-					ruleWindow.setVisible(true);
-				} catch (FileNotFoundException e) {
-					System.out.println(e);
-				}
-			}
-		});
+		help.setActionCommand("Help");
+		help.addActionListener(this);
+
 		fileOptionMenu.add(rules);
 		fileOptionMenu.add(help);
 		menuBar.add(fileOptionMenu);
@@ -157,20 +124,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 
 		JButton endTurn = new JButton("End Turn");
 		endTurn.setActionCommand("End Turn");
-		endTurn.addActionListener( this );
-//		new ActionListener() {
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				game.nextTurn();
-//				currentPlayer = game.currentPlayer();
-//				list.setPlayer(0);
-//				cardCanvas.updateCards(new ArrayList<String>());
-//				JOptionPane.showMessageDialog(CluedoUI.this, "It's " + characters.get(currentPlayer) + "'s turn!");
-//				list.setPlayer(currentPlayer);
-//				// cardCanvas.updateCards(game.getCards(currentPlayer)); TODO make getCards
-//
-//			}
-//		});
+		endTurn.addActionListener(this);
 
 		JPanel south = new JPanel();
 		south.setLayout(new BorderLayout());
@@ -208,24 +162,21 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		model.addElement(6);
 		JComboBox<Integer> comboBox = new JComboBox<Integer>(model);
 		panel.add(comboBox);
-		// FIXME make no cancel option
-		//int result = JOptionPane.showMessageDialog(this, panel, "Welcome to Cluedo!", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-		int result = JOptionPane.showConfirmDialog(null, panel, "Welcome to Cluedo!", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			SelectPlayerDialog s = new SelectPlayerDialog(this, characters, players, (int)comboBox.getSelectedItem());
-			while (!this.go) {	/// TODO gah
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
+
+		JOptionPane.showMessageDialog(this, panel, "Welcome to Cluedo!", JOptionPane.PLAIN_MESSAGE);
+
+		SelectPlayerDialog s = new SelectPlayerDialog(this, characters, players, (int)comboBox.getSelectedItem());
+		while (!this.go) {	/// TODO gah
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
 			}
-		} else {
-			// TODO cancel game?
 		}
+
 		// FIXME executes before dialog finishes
-		for (Integer s: players.keySet()) {
-			game.addPlayer(s);
+		for (Integer p: players.keySet()) {
+			game.addPlayer(p);
 		}
 		game.startGame();
 	}
@@ -281,9 +232,43 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			currentPlayer = game.currentPlayer();
 			list.setPlayer(0);
 			cardCanvas.updateCards(new ArrayList<String>());
-			JOptionPane.showMessageDialog(CluedoUI.this, "It's " + characters.get(currentPlayer) + "'s turn!");
+			JOptionPane.showMessageDialog(CluedoUI.this, "It's " + players.get(currentPlayer) + "'s turn as " + characters.get(currentPlayer) +"!");
 			list.setPlayer(currentPlayer);
 			// cardCanvas.updateCards(game.getCards(currentPlayer)); TODO make getCards
+		} else if (e.getActionCommand().equals("Rules")) {
+			try {
+				JFrame ruleWindow = new JFrame();
+				ruleWindow.setPreferredSize(new Dimension(630, 700));
+				ruleWindow.setLayout(new BorderLayout());
+				String text = new Scanner(new File("assets/rules.txt")).useDelimiter("\\Z").next();
+				JTextArea ta = new JTextArea(text);
+				JScrollPane sp = new JScrollPane(ta);
+				sp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+				ruleWindow.add(sp, BorderLayout.CENTER);
+				ruleWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				ruleWindow.pack();
+				ruleWindow.setResizable(false);
+				ruleWindow.setVisible(true);
+			} catch (FileNotFoundException err) {
+				System.out.println(err);
+			}
+		} else if (e.getActionCommand().equals("Help")) {
+			try {
+				JFrame ruleWindow = new JFrame();
+				ruleWindow.setPreferredSize(new Dimension(460, 400));
+				ruleWindow.setLayout(new BorderLayout());
+				String text = new Scanner(new File("assets/help.txt")).useDelimiter("\\Z").next();
+				JTextArea ta = new JTextArea(text);
+				JScrollPane sp = new JScrollPane(ta);
+				sp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+				ruleWindow.add(sp, BorderLayout.CENTER);
+				ruleWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				ruleWindow.pack();
+				ruleWindow.setResizable(false);
+				ruleWindow.setVisible(true);
+			} catch (FileNotFoundException err) {
+				System.out.println(err);
+			}
 		}
 
 	}
