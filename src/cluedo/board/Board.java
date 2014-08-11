@@ -89,6 +89,7 @@ public class Board {
 		generateRoomList();
 	}
 	
+	//Return moves remaining for the player
 	public int getMovesLeft(){
 		return currentMove;
 	}
