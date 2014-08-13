@@ -349,6 +349,7 @@ public class Board {
 	}
 	
 	public int move(Coordinate endPoint){
+		if (!(endPoint.getX() >= 0) && !(endPoint.getX() < aStarBoard.length) && !(endPoint.getY() >= 0) && !(endPoint.getY() < aStarBoard[0].length)) return FAIL;
 		if (!aStarBoard[endPoint.getX()][endPoint.getY()]) return FAIL; //If it's impossible to move to the end position returns fail
 		Coordinate start;
 		if (playerList.get(currentPlayer).currentRoom() != 0){
@@ -358,6 +359,7 @@ public class Board {
 			start = playerList.get(currentPlayer).getCoords(); //Otherwise start position is the current coords
 		}
 		if (board[endPoint.getX()][endPoint.getY()] instanceof Room){
+			if (board[start.getX()][start.getY()] instanceof Room) return FAIL;
 			Room endRoom = (Room) board[endPoint.getX()][endPoint.getY()];
 			endPoint = bestExit(endRoom, start);
 		}
@@ -371,6 +373,7 @@ public class Board {
 		if (board[endPoint.getX()][endPoint.getY()] instanceof Room){
 			//Sets Player's coordinates to the middle of the Room, <3 Kelsey Please don't hate me :(
 			playerList.get(currentPlayer).setCoords(roomCoords.get(convertRoom(((Room) board[endPoint.getX()][endPoint.getY()]).getName())));
+			playerList.get(currentPlayer).setRoom(((Room) board[endPoint.getX()][endPoint.getY()]).getName());
 			currentMove = 0;
 		} else {
 			currentMove -= path.getLength(); //Removes the distance travelled from the move pool
