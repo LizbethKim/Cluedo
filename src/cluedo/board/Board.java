@@ -238,6 +238,12 @@ public class Board {
 		return solution;
 	}
 
+	/**
+	 * 
+	 * @param suggestion
+	 * @return SUCCESS if a correct guess, FAIL if incorrect, nothing if the 
+	 * guess was an invalid guess or made at an invalid time.
+	 */
 	public int accuse(int suggestion){
 		if (currentState == 0 || currentState == 2){
 			if (findRoom(suggestion) >= 100 && findRoom(suggestion) <= 900 && findWeapon(suggestion) >= 10 && findWeapon(suggestion) <= 60 && findChar(suggestion) >= 1 && findChar(suggestion) <= 6){

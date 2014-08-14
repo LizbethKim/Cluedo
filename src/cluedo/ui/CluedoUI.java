@@ -191,13 +191,20 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 						// TODO refuting
 					}
 				}
-			} //else if (game.getState() == 0 && game.getRoom(c) == Board.NOTHING) {
-//				//initialise accusation!
+			} else if (game.getState() == 0 && game.getRoom(c) == Board.MIDDLE) {
+				int guess = new SuggestDialog(0).getGuess();
+				int result = game.accuse(guess);
+				if (result == Board.SUCCESS) {
+					// TODO end the game with a win
+				} else if (result == Board.FAIL) {
+					// TODO display losing message
+				} else {
+					// TODO maybe display message?
+				}
 			
-			//} //else if (game.getState() == 0 && something something corner room) {
+			} //else if (game.getState() == 0 && something something corner room) {
 				//secret passage
 			//}
-			System.out.println(game.getRoom(c));
 		// Dice roll
 		} else if (dicePane.contains(e.getX(), e.getY() - bottomPaneTop) && game.getState() == 0) {
 			int newRoll = dicePane.rollDice();
