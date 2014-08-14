@@ -110,6 +110,18 @@ public class Tests {
 		board.nextTurn();
 		assertTrue(board.getState() == 5);
 	}
+	
+	@Test
+	public void testCardSize(){
+		Board board = makeBoard();
+		board.addPlayer(1);
+		board.addPlayer(2);
+		board.addPlayer(3);
+		board.startGame();
+		assertTrue(board.getPlayerCards(1).size() == 6);
+		assertTrue(board.getPlayerCards(2).size() == 6);
+		assertTrue(board.getPlayerCards(3).size() == 6);
+	}
 
 
 	public Board makeBoard(){

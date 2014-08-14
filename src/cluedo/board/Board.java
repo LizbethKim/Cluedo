@@ -119,7 +119,7 @@ public class Board {
 			allCards.add(new WeaponCard(i));
 		}
 		int roome = (int) ((Math.random()*9)+1)*100;
-		for (int i = 100; i < 1100; i = i + 100){
+		for (int i = 100; i < 1000; i = i + 100){
 			if (i == roome) continue;
 			allCards.add(new RoomCard(i));
 		}
@@ -152,7 +152,7 @@ public class Board {
 	
 	public List<Integer> getPlayerCards(int chara){
 		List<Integer> list = new ArrayList<Integer>();
-		for (Card c:playerList.get(chara).getCards()){
+		for (Card c:playerList.get(chara - 1).getCards()){
 			list.add(c.getCard());
 		}
 		return list;
