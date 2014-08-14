@@ -103,7 +103,7 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 				if (leftToChoose <= 0) {
 					this.done = true;
 				}
-
+				// FIXME pressing ok twice in a row counts as two!!
 			}
 		} else {
 			buttons.get(selectedPlayer).showTextPane(false);
