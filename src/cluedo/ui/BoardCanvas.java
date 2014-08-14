@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import cluedo.Coordinate;
 import cluedo.board.Board;
 
+@SuppressWarnings("serial")
 public class BoardCanvas extends JPanel{
 
 	private Image boardPic;

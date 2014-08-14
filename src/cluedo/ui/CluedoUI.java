@@ -47,8 +47,8 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 
 	private final int boardCanvasTop = 45;
 	private final int bottomPaneTop;
-	private final int cardCanvasLeft = 130;
-	private final int checkPaneLeft;
+//	private final int cardCanvasLeft = 130;
+//	private final int checkPaneLeft;
 
 	private Board game;
 	private int currentPlayer = 1;
@@ -141,7 +141,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		addMouseListener(this);
 
 		bottomPaneTop = canvas.getHeight() + boardCanvasTop;
-		checkPaneLeft = canvas.getWidth();
+//		checkPaneLeft = canvas.getWidth();
 
 		JPanel panel = new JPanel();
 		panel.add(new JLabel("How many players?"));
@@ -185,11 +185,19 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			if (game.getState() == 1) {
 				game.move(c);
 				canvas.repaint();
-			} //else if (game.getState() == 0 && something to do with middle room ) {
-				//initialise accusation!
-			//} else if (game.getState() == 0 && something something corner room) {
+				if (game.getRoom() != Board.NOTHING) {
+					int guess = new SuggestDialog(game.getRoom()).getGuess();
+					if (game.suggest(guess)) {
+						// TODO refuting
+					}
+				}
+			} //else if (game.getState() == 0 && game.getRoom(c) == Board.NOTHING) {
+//				//initialise accusation!
+			
+			//} //else if (game.getState() == 0 && something something corner room) {
 				//secret passage
 			//}
+			System.out.println(game.getRoom(c));
 		// Dice roll
 		} else if (dicePane.contains(e.getX(), e.getY() - bottomPaneTop) && game.getState() == 0) {
 			int newRoll = dicePane.rollDice();

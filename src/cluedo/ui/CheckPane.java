@@ -1,7 +1,6 @@
 package cluedo.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -23,14 +22,15 @@ import javax.swing.border.TitledBorder;
 public class CheckPane extends JPanel {
 	
 	private String[] cardNames = { "Professor Plum", "Colonel Mustard", "Miss Scarlett", "Mrs White", "Rev Green", "Miss Peacock", "Spanner", "Dagger", "Rope", "Candlestick", "Revolver", "Lead Pipe", "Kitchen", "Dining Room", "Ballroom", "Study", "Conservatory", "Lounge", "Billiard Room", "Library", "Hall" };
-	private Map<Integer, JList> lists;	// each player's list
+	private Map<Integer, JList<CheckableItem>> lists;	// each player's list
 	private int currentPlayer = 1;
 	
 	
+	@SuppressWarnings("unchecked")
 	public CheckPane() {
 		
 		// create and populate the map for players' lists
-		lists = new HashMap<Integer, JList>();
+		lists = new HashMap<Integer, JList<CheckableItem>>();
 		for (int i = 1; i < 7; i++) {
 			final JList<CheckableItem> list = new JList<CheckableItem>(createData(cardNames));
 			list.setCellRenderer(new CheckListRenderer());
@@ -111,6 +111,7 @@ public class CheckPane extends JPanel {
 	}
     
     
+	@SuppressWarnings("rawtypes")
 	private class CheckListRenderer extends JCheckBox implements ListCellRenderer {
 
         public CheckListRenderer() {

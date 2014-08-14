@@ -18,6 +18,7 @@ import javax.swing.JPanel;
  * @author kelsey
  *
  */
+@SuppressWarnings("serial")
 public class DicePane extends JPanel {
 	private Random r;
 	private int d1 = 6;

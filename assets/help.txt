@@ -6,5 +6,10 @@ other end instead of rolling your dice.
 If you wish to make an accusation, click the centre room instead of 
 rolling your dice. Accusations may happen at the beginning of a turn.
 
+If you choose to roll the dice, the amount you have left to travel 
+will be displayed in the bottom right corner. If you travel less than 
+this amount, you may travel again until you have used up your moves.
+Entering a room will end your movement.
+
 Use the list down the right of the window to keep track of what you
 believe has been eliminated.
