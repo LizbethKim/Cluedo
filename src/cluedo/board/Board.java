@@ -9,20 +9,24 @@ import java.util.Queue;
 import cluedo.AStar;
 import cluedo.Coordinate;
 import cluedo.models.Card;
+import cluedo.models.CharCard;
 import cluedo.models.Hallway;
 import cluedo.models.Player;
 import cluedo.models.Room;
+import cluedo.models.RoomCard;
 import cluedo.models.Square;
+import cluedo.models.UnreachableRoom;
 import cluedo.models.Wall;
+import cluedo.models.WeaponCard;
 
 public class Board {
-	
+
 	//Success/Failure
 	public static final int NOTHING = 0;
 	public static final int SUCCESS = 7;
 	public static final int INVALIDCARD = 8;
 	public static final int FAIL = 9;
-	
+
 	//Characters
 	public static final int SCARLETT = 1;
 	public static final int MUSTARD = 2;
@@ -30,7 +34,7 @@ public class Board {
 	public static final int GREEN = 4;
 	public static final int PEACOCK = 5;
 	public static final int PLUM = 6;
-	
+
 	//Weapons
 	public static final int CANDLESTICK = 10;
 	public static final int DAGGER = 20;
@@ -38,7 +42,7 @@ public class Board {
 	public static final int REVOLVER = 40;
 	public static final int ROPE = 50;
 	public static final int SPANNER = 60;
-	
+
 	//Rooms
 	public static final int KITCHEN = 100;
 	public static final int BALLROOM = 200;
@@ -49,8 +53,9 @@ public class Board {
 	public static final int HALL = 700;
 	public static final int LOUNGE = 800;
 	public static final int DINING = 900;
+	public static final int MIDDLE = 1000;
 
-	
+
 	private Square[][] board;
 	private List<Room> roomList;
 	private List<Coordinate> roomCoords;
@@ -64,7 +69,7 @@ public class Board {
 	private int refutePlayer;		//Used for when going around to refute a suggestion/accusation
 	private int currentAccuse;		//Current set of cards being accused
 	private boolean[][] aStarBoard;
-	
+
 	/*
 	 * States: -1 = Initialization
 	 * 0 = Start Turn (Roll dice/Secret Passage/Make accusation)
@@ -74,7 +79,7 @@ public class Board {
 	 * 5 = Game is over
 	 */
 	private int currentState;
-	
+
 	public Board(int x, int y){
 		board = new Square[x][y];
 		currentState = -1;
@@ -88,12 +93,12 @@ public class Board {
 		generateRoomCoords();
 		generateRoomList();
 	}
-	
+
 	//Return moves remaining for the player
 	public int getMovesLeft(){
 		return currentMove;
 	}
-	
+
 	private void populateCharList(){
 		charList.add(new Player(0, 0, 0, false));
 		for (int i = 1; i < 7; i++){
@@ -101,10 +106,36 @@ public class Board {
 		}
 	}
 
-	
+	private void cardDistribution(){
+		List<Card> allCards = new ArrayList<Card>();
+		int chara = (int) ((Math.random()*6)+1);
+		for (int i = 1; i < 7; i++){
+			if (i == chara) continue;
+			allCards.add(new CharCard(i));
+		}
+		int weapon = (int) ((Math.random()*6)+1)*10;
+		for (int i = 10; i < 70; i = i + 10){
+			if (i == weapon) continue;
+			allCards.add(new WeaponCard(i));
+		}
+		int roome = (int) ((Math.random()*9)+1)*100;
+		for (int i = 100; i < 1100; i = i + 100){
+			if (i == roome) continue;
+			allCards.add(new RoomCard(i));
+		}
+		solution = chara + weapon + roome;
+		Collections.shuffle(allCards);
+		int i = 0;
+		for (Card c : allCards){
+			playerList.get(i%numPlayers).addCard(c);
+			i++;
+		}
+	}
+
+
 	/*
-	 * Sets the number of players, sorts players into order, sets current player 
-	 * creates new "Can go" map, sets state to first state. 
+	 * Sets the number of players, sorts players into order, sets current player
+	 * creates new "Can go" map, sets state to first state.
 	 */
 	@SuppressWarnings("unchecked")
 	public boolean startGame(){
@@ -115,29 +146,38 @@ public class Board {
 		currentPlayer = 0;
 		refutePlayer = 0;
 		aStarBoard = aStarBoard();
+		cardDistribution();
 		return true;
 	}
 	
+	public List<Integer> getPlayerCards(int chara){
+		List<Integer> list = new ArrayList<Integer>();
+		for (Card c:playerList.get(chara).getCards()){
+			list.add(c.getCard());
+		}
+		return list;
+	}
+
 	//Returns the character ENUM for the current player
 	public int currentPlayer(){
 		return playerList.get(currentPlayer).getChar();
 	}
-	
+
 	//Returns the player coords of the player ENUM
 	public Coordinate getPlayerCoords(int player){
 		return charList.get(player).getCoords();
 	}
-	
+
 	//This may be confusing, but was mainly used for testing purposes. Please ignore.
 	public Player getCurrentPlayer(){
 		return playerList.get(currentPlayer);
 	}
-	
+
 	//Returns a list of Coordinates of each room
 	public List<Coordinate> getRoomCoords(){
 		return roomCoords;
 	}
-	
+
 	//Returns the list of cards a player currently possesses as ENUMs
 	public List<Integer> getPlayerCards(){
 		List<Integer> playerCards = new ArrayList<Integer>();
@@ -146,8 +186,8 @@ public class Board {
 		}
 		return playerCards;
 	}
-	
-	//Must ensure Player's room is set correctly before attempting this 
+
+	//Must ensure Player's room is set correctly before attempting this
 	public boolean takePassage(){
 		if (currentState == 0){
 			if (playerList.get(currentPlayer).currentRoom() != NOTHING){
@@ -156,7 +196,7 @@ public class Board {
 				if (passage != NOTHING){
 					playerList.get(currentPlayer).setRoom(passage);
 					//Gets the room from the roomList using the ID given by the passage. Looks more complicated than it is
-					playerList.get(currentPlayer).setCoords(roomList.get(convertRoom(passage)).getExits().get(0));
+					playerList.get(currentPlayer).setCoords(roomCoords.get(convertRoom(passage)));
 					moveState();
 					moveState();
 					return true;
@@ -165,14 +205,14 @@ public class Board {
 		}
 		return false;
 	}
-	
-	
+
+
 	//Returns the current suggest attempt
 	public int currentSuggest(){
 		if (currentState == 2 || currentState == 3) {return currentSuggest;}
 		return NOTHING;
 	}
-	
+
 	/*
 	 * Suggest mechanism, suggest an ENUM combination (3 numbers). Returns true if it's valid to suggest at the time
 	 * else returns false if invalid. CAN ONLY SUGGEST IN STATE 2 -AFTER- the movement.
@@ -193,7 +233,11 @@ public class Board {
 		}
 		return false;
 	}
-	
+
+	public int getSoln(){
+		return solution;
+	}
+
 	public int accuse(int suggestion){
 		if (currentState == 0 || currentState == 2){
 			if (findRoom(suggestion) >= 100 && findRoom(suggestion) <= 900 && findWeapon(suggestion) >= 10 && findWeapon(suggestion) <= 60 && findChar(suggestion) >= 1 && findChar(suggestion) <= 6){
@@ -208,7 +252,7 @@ public class Board {
 		}
 		return NOTHING;
 	}
-	
+
 	//For automating retrieving things from lists
 	private Player getPlayer(int character){
 		for (Player p:charList){
@@ -222,23 +266,25 @@ public class Board {
 		}
 		return null;
 	}
-	
-	
+
+
 	//If not given an argument, getRoom() returns the room of the current player. ENUM of room or NOTHING
 	public int getRoom(){
 		return playerList.get(currentPlayer).currentRoom();
 	}
-	
+
 	//If given coords, checks whether that's a room and returns the room's ENUM or NOTHING
 	public int getRoom(Coordinate coord){
 		if (board[coord.getX()][coord.getY()] instanceof Room){
 			return ((Room) board[coord.getX()][coord.getY()]).getName();
+		} else if (board[coord.getX()][coord.getY()] instanceof UnreachableRoom){
+			return 1000;
 		} else {
 			return NOTHING;
 		}
 	}
-	
-	
+
+
 	/*
 	 * Refuting mechanism. Will take a card ENUM, and return a NOTHING if the player refuted nothing (passing)
 	 * or the card ENUM if the refute is successful, or SUCCESS if the player's suggestion goes through. If it's
@@ -273,8 +319,8 @@ public class Board {
 		}
 		return INVALIDCARD;
 	}
-	
-	//Starts the next turn. Should only be called by Board. 
+
+	//Starts the next turn. Should only be called by Board.
 	public void nextTurn(){
 		if (currentState == 5) return;
 		int tempCurrentPlayer = currentPlayer;
@@ -284,47 +330,48 @@ public class Board {
 		}
 		if (currentPlayer == tempCurrentPlayer && !playerList.get(currentPlayer).playable()){
 			gameEnd();
+			return;
 		}
 		aStarBoard = aStarBoard();
 		currentState = 0;
 	}
-	
+
 	public void gameEnd(){
 		currentState = 5;
 	}
-	
+
 	//Moves the variable to the next player/state. Again should only be called by Board
 	private void moveRefute(){
 		refutePlayer = (refutePlayer + 1) % numPlayers;
 	}
-	
+
 	private void moveState(){
 		currentState = (currentState + 1) % 4;
 	}
-	
+
 	private void movePlayer(){
 		currentPlayer = (currentPlayer + 1) % numPlayers;
 	}
-	
-	
+
+
 	//Converts a number into a single digit room ID number to access roomList (from a 3 digit combo)
 	public int convertRoom(int room){
 		return ((room/100)%10);
 	}
-	
+
 	//Converts a number into the appropriate ENUM values for comparisons (from a 3 digit combo)
 	public int findRoom(int room){
 		return ((room/100)%10)*100;
 	}
-	
+
 	public int findWeapon(int weapon){
 		return ((weapon/10)%10)*10;
 	}
-	
+
 	public int findChar(int character){
 		return (character%10);
 	}
-	
+
 	public boolean rollDice(int roll){
 		if (currentState == 0) {
 			currentMove = roll;
@@ -333,11 +380,11 @@ public class Board {
 		}
 		return false;
 	}
-	
+
 	public int getState(){
 		return currentState;
 	}
-	
+
 	public boolean addPlayer(int chara){
 		if (currentState != -1){
 			return false;
@@ -347,7 +394,7 @@ public class Board {
 			return true;
 		}
 	}
-	
+
 	public int move(Coordinate endPoint){
 		if (!(endPoint.getX() >= 0) && !(endPoint.getX() < aStarBoard.length) && !(endPoint.getY() >= 0) && !(endPoint.getY() < aStarBoard[0].length)) return FAIL;
 		if (!aStarBoard[endPoint.getX()][endPoint.getY()]) return FAIL; //If it's impossible to move to the end position returns fail
@@ -385,8 +432,8 @@ public class Board {
 		}
 		return NOTHING; //If more movement is possible, returns 0 assuming more move commands will be given in the future.
 	}
-	
-	
+
+
 	/*
 	 * Simple A* Algorithm, returns the path if possible, else null. Should never null as all the logic
 	 * should be checked by the move command.
@@ -426,11 +473,11 @@ public class Board {
 		}
 		return null;
 	}
-	
+
 	private boolean visited(Coordinate coords, boolean[][] aStarBoard){
 		return !(aStarBoard[coords.getX()][coords.getY()]);
 	}
-	
+
 	private Coordinate bestExit(Room room, Coordinate endPoint){
 		int min = Integer.MAX_VALUE;
 		Coordinate bestExit = new Coordinate(0, 0);
@@ -442,11 +489,11 @@ public class Board {
 		}
 		return bestExit;
 	}
-	
+
 	private int getDistance(Coordinate startPoint, Coordinate endPoint){
 		return (Math.abs(startPoint.getX() - endPoint.getX()) + Math.abs(startPoint.getY() - endPoint.getY()));
 	}
-	
+
 	private Player addPlayer(int chara, boolean player){
 		if (currentState != -1){
 			return null;
@@ -468,7 +515,7 @@ public class Board {
 			return null;
 		}
 	}
-	
+
 	private void generateRoomCoords(){
 		roomCoords.add(new Coordinate(0, 0)); //Skipping 0 for aesthetics purposes
 		roomCoords.add(new Coordinate(2, 4));
@@ -481,7 +528,7 @@ public class Board {
 		roomCoords.add(new Coordinate(3, 21));
 		roomCoords.add(new Coordinate(3, 12));
 	}
-	
+
 	private void generateRoomList(){
 		roomList.add(new Room(NOTHING));
 		roomList.add(new Room(KITCHEN));
@@ -515,9 +562,9 @@ public class Board {
 		roomList.get(3).addPassage(LOUNGE);
 		roomList.get(8).addPassage(CONSERVATORY);
 	}
-	
+
 	public void addWall(int x, int y) {
-		board[x][y] = new Wall();		
+		board[x][y] = new Wall();
 	}
 	public void addHallway(int x, int y) {
 		board[x][y] = new Hallway(new Coordinate(x, y));
@@ -525,7 +572,7 @@ public class Board {
 	public void addRoom(int x, int y, int room){
 		board[x][y] = roomList.get(room);
 	}
-	
+
 	public void printBoard(){
 		for (int i = 0; i < board[0].length; i++){
 			for (int j = 0; j < board.length; j++){
@@ -560,7 +607,7 @@ public class Board {
 			System.out.println("");
 		}
 	}
-	
+
 	private boolean[][] aStarBoard(){
 		boolean[][] aStarBoard = new boolean[board.length][board[0].length];
 		for (int i = 0; i < board[0].length; i++){
@@ -577,6 +624,10 @@ public class Board {
 			aStarBoard[loc.getX()][loc.getY()] = false;
 		}
 		return aStarBoard;
+	}
+
+	public void addMiddleRoom(int x, int y) {
+		board[x][y] = new UnreachableRoom();
 	}
 
 }

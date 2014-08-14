@@ -3,6 +3,7 @@ package cluedo.tests;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -14,7 +15,7 @@ import cluedo.models.Player;
 
 
 public class Tests {
-	
+
 	@Test
 	public void cardTest(){
 		Board board = makeBoard();
@@ -23,7 +24,7 @@ public class Tests {
 		assertTrue(board.findChar(512) == 2);
 		assertTrue(board.convertRoom(512) == 5);
 	}
-	
+
 	@Test
 	public void passageTest(){
 		Board board = makeBoard();
@@ -32,11 +33,12 @@ public class Tests {
 		Player cur = board.getCurrentPlayer();
 		cur.setCoords(new Coordinate(4, 6));
 		cur.setRoom(100);
+		List<Coordinate> meow = board.getRoomCoords();
 		assertTrue(board.takePassage());
-		assertTrue(cur.getCoords().equals(new Coordinate(17, 21)));
+		assertTrue(cur.getCoords().equals(meow.get(6)));
 		assertTrue(cur.currentRoom() == 600);
 	}
-	
+
 	@Test
 	public void testAStarFuuu(){
 		Board board = makeBoard();
@@ -48,7 +50,7 @@ public class Tests {
 		assertTrue(path.getLength() == 8);
 		assertTrue(path.getHeuristic() == 0);
 	}
-	
+
 	@Test
 	public void testMovement(){
 		Board board = makeBoard();
@@ -63,7 +65,7 @@ public class Tests {
 		board.rollDice(2);
 		assertTrue(board.move(new Coordinate(7, 23)) == 0); //0 is the NOTHING enum, means there's still more moves to go.
 	}
-	
+
 	@Test
 	public void listSync(){
 		Board board = makeBoard();
@@ -76,12 +78,40 @@ public class Tests {
 		cur = board.getCurrentPlayer();
 		assertTrue(cur.getCoords().equals(board.getPlayerCoords(3)));
 	}
-	
-	
-	
-	
-	
-	
+
+	@Test
+	public void testMiddleRoom(){
+		Board board = makeBoard();
+		assertTrue(board.getRoom(new Coordinate(11, 10)) == 1000); //Middle room detection
+		board.addPlayer(1);
+		board.startGame();
+		board.rollDice(100);
+		assertTrue(board.move(new Coordinate(11, 10)) == 9);
+	}
+
+	@Test
+	public void testAccuse(){
+		Board board = makeBoard();
+		board.addPlayer(1);
+		board.startGame();
+		int solution = board.getSoln();
+		assertTrue(board.accuse(solution) == 7);
+	}
+
+	@Test
+	public void testAccuseFail(){
+		Board board = makeBoard();
+		board.addPlayer(1);
+		board.startGame();
+		int solution = board.getSoln();
+		assertTrue(board.accuse(994) == 0);
+		if (solution != 444) assertTrue(board.accuse(444) == 9);
+		else{assertTrue(board.accuse(443) == 9);}
+		board.nextTurn();
+		assertTrue(board.getState() == 5);
+	}
+
+
 	public Board makeBoard(){
 		try {
 			Board board = Main.createBoardFromFile("board.txt");

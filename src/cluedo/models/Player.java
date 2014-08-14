@@ -1,5 +1,6 @@
 package cluedo.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cluedo.Coordinate;
@@ -15,6 +16,7 @@ public class Player implements Comparable{
 	
 	public Player(int character, int x, int y, boolean playable){
 		this.character = character;
+		cards = new ArrayList<Card>();
 		coords = new Coordinate(x, y);
 		room = Board.NOTHING;
 		this.playable = playable;
