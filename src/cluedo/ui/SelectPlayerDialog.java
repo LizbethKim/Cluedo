@@ -26,23 +26,24 @@ import javax.swing.JTextField;
 @SuppressWarnings("serial")
 public class SelectPlayerDialog extends JDialog implements ActionListener {
 	private Map<Integer, String> playerInfo;
-	private Map<Integer, String> characters;
 	private Map<String, ButtonRow> buttons;
 
 	private ButtonGroup group;
 	private JPanel whole;
 	private String selectedPlayer = "Miss Scarlett";
 	private int leftToChoose;
+	
+	private boolean done;
 
-	public SelectPlayerDialog(JFrame f, Map<Integer, String> characters, Map<Integer, String> playerInfo, int numPlayers) {
+	public SelectPlayerDialog(JFrame f, Map<Integer, String> playerInfo, int numPlayers) {
 		super(f, "Select a Character");
-		this.characters = characters;
+		this.done = false;
 		this.playerInfo = playerInfo;
 		leftToChoose = numPlayers;
 		this.buttons = new HashMap<String, ButtonRow>();
 
 		for (int i = 1; i < 7; i++) {
-			buttons.put(characters.get(i), new ButtonRow(characters.get(i)));
+			buttons.put(CluedoUI.asString(i), new ButtonRow(CluedoUI.asString(i)));
 		}
 		buttons.get("Miss Scarlett").b.setSelected(true);
 
@@ -80,6 +81,10 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 
 	}
 
+	public boolean done() {
+		return this.done;
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent a) {
 		String command = a.getActionCommand();
@@ -88,7 +93,7 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 			if (text.length() > 0) {
 				int character = 0;
 					for (int i = 1; i < 7; i++) {
-						if (characters.get(i).equals(selectedPlayer)) {
+						if (CluedoUI.asString(i).equals(selectedPlayer)) {
 							character = i;
 						}
 					}
@@ -96,8 +101,7 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 				leftToChoose--;
 				buttons.get(selectedPlayer).greyOut();
 				if (leftToChoose <= 0) {
-					CluedoUI.go = true;
-					dispose();
+					this.done = true;
 				}
 
 			}

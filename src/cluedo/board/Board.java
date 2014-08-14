@@ -371,12 +371,12 @@ public class Board {
 			temp = temp.getParent();
 		}
 		if (board[endPoint.getX()][endPoint.getY()] instanceof Room){
-			//Sets Player's coordinates to the middle of the Room, <3 Kelsey Please don't hate me :(
+			//Sets Player's coordinates to the middle of the Room, <3 Kelsey Please don't hate me :( TODO
 			playerList.get(currentPlayer).setCoords(roomCoords.get(convertRoom(((Room) board[endPoint.getX()][endPoint.getY()]).getName())));
 			playerList.get(currentPlayer).setRoom(((Room) board[endPoint.getX()][endPoint.getY()]).getName());
 			currentMove = 0;
 		} else {
-			currentMove -= path.getLength(); //Removes the distance travelled from the move pool
+			currentMove -= path.getLength(); //Removes the distance traveled from the move pool
 			playerList.get(currentPlayer).setCoords(endPoint); //Updates player coordinates
 		}
 		if (currentMove == 0) { //If no more movement is possible, moves the state and returns success

@@ -3,13 +3,10 @@ package cluedo.ui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -40,6 +37,7 @@ import cluedo.board.Board;
  * @author kelsey
  *
  */
+@SuppressWarnings("serial")
 public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 
 	private BoardCanvas canvas;
@@ -54,7 +52,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 
 	private Board game;
 	private int currentPlayer = 1;
-	private Map<Integer, String> characters;
+//	private Map<Integer, String> characters;
 	private Map<Integer, String> players;
 
 	public static boolean go;	// FIXME!!!
@@ -62,13 +60,13 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 	public CluedoUI(Board game) {
 		super("Cluedo");
 		this.game = game;
-		characters = new HashMap<Integer, String>();
-		characters.put(Board.SCARLETT, "Miss Scarlett");
-		characters.put(Board.MUSTARD, "Colonel Mustard");
-		characters.put(Board.WHITE, "Mrs White");
-		characters.put(Board.GREEN, "Rev Green");
-		characters.put(Board.PEACOCK, "Miss Peacock");
-		characters.put(Board.PLUM, "Professor Plum");
+//		characters = new HashMap<Integer, String>();
+//		characters.put(Board.SCARLETT, "Miss Scarlett");
+//		characters.put(Board.MUSTARD, "Colonel Mustard");
+//		characters.put(Board.WHITE, "Mrs White");
+//		characters.put(Board.GREEN, "Rev Green");
+//		characters.put(Board.PEACOCK, "Miss Peacock");
+//		characters.put(Board.PLUM, "Professor Plum");
 		players = new HashMap<Integer, String>();
 
 		// Set up the menus
@@ -109,18 +107,10 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		setJMenuBar(menuBar);
 
 		// set up the canvases and panes
-		canvas = new BoardCanvas(true, game); // create canvas
+		canvas = new BoardCanvas(false, game); // create canvas
 		cardCanvas = new CardCanvas();
 		dicePane = new DicePane();
 		list = new CheckPane();
-		List<String> init = new ArrayList<String>();// TODO delete
-		init.add("plum");
-		init.add("leadpipe");
-		init.add("ballroom");
-		init.add("lounge");
-		init.add("mustard");
-		init.add("green");
-		cardCanvas.updateCards(init); // TODO delete
 
 		JButton endTurn = new JButton("End Turn");
 		endTurn.setActionCommand("End Turn");
@@ -162,24 +152,28 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		model.addElement(6);
 		JComboBox<Integer> comboBox = new JComboBox<Integer>(model);
 		panel.add(comboBox);
-
+		
 		JOptionPane.showMessageDialog(this, panel, "Welcome to Cluedo!", JOptionPane.PLAIN_MESSAGE);
 
-		SelectPlayerDialog s = new SelectPlayerDialog(this, characters, players, (int)comboBox.getSelectedItem());
-		while (!this.go) {	/// TODO gah
+		
+		SelectPlayerDialog s = new SelectPlayerDialog(this, players, (int)comboBox.getSelectedItem());
+		while(!s.done()) {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e1) {
+				System.out.println(e1);
 				e1.printStackTrace();
 			}
 		}
-
+		s.dispose();
+		
 		// FIXME executes before dialog finishes
 		for (Integer p: players.keySet()) {
 			game.addPlayer(p);
 		}
 		game.startGame();
 	}
+
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
@@ -204,43 +198,24 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 
 	}
 
-//	public static void main(String[] args) {
-//		new CluedoUI();
-//
-//	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("End Turn")) {
 			game.nextTurn();
 			currentPlayer = game.currentPlayer();
 			list.setPlayer(0);
-			cardCanvas.updateCards(new ArrayList<String>());
-			JOptionPane.showMessageDialog(CluedoUI.this, "It's " + players.get(currentPlayer) + "'s turn as " + characters.get(currentPlayer) +"!");
+			cardCanvas.updateCards(new ArrayList<Integer>());
+			JOptionPane.showMessageDialog(CluedoUI.this, "It's " + players.get(currentPlayer) + "'s turn as " + CluedoUI.asString(currentPlayer) +"!");
 			list.setPlayer(currentPlayer);
-			// cardCanvas.updateCards(game.getCards(currentPlayer)); TODO make getCards
+			cardCanvas.updateCards(game.getPlayerCards());
 		} else if (e.getActionCommand().equals("Rules")) {
 			try {
 				JFrame ruleWindow = new JFrame();
 				ruleWindow.setPreferredSize(new Dimension(630, 700));
 				ruleWindow.setLayout(new BorderLayout());
-				String text = new Scanner(new File("assets/rules.txt")).useDelimiter("\\Z").next();
+				Scanner sc = new Scanner(new File("assets/rules.txt"));
+				String text = sc.useDelimiter("\\Z").next();
+				sc.close();
 				JTextArea ta = new JTextArea(text);
 				JScrollPane sp = new JScrollPane(ta);
 				sp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -257,7 +232,9 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 				JFrame ruleWindow = new JFrame();
 				ruleWindow.setPreferredSize(new Dimension(460, 400));
 				ruleWindow.setLayout(new BorderLayout());
-				String text = new Scanner(new File("assets/help.txt")).useDelimiter("\\Z").next();
+				Scanner sc = new Scanner(new File("assets/help.txt"));
+				String text = sc.useDelimiter("\\Z").next();
+				sc.close();
 				JTextArea ta = new JTextArea(text);
 				JScrollPane sp = new JScrollPane(ta);
 				sp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -272,23 +249,85 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		}
 
 	}
+	
+	/**
+	 * Turns the integer values used within the program into the string that 
+	 * is its name.
+	 * @param gamePart the integer related to the component
+	 */
+	public static String  asString (int gamePart) {
+		switch (gamePart) {
+			case Board.SCARLETT: return "Miss Scarlett";
+			case Board.MUSTARD: return "Colonel Mustard";
+			case Board.WHITE: return "Mrs White";
+			case Board.GREEN: return "Rev Green";
+			case Board.PEACOCK: return "Miss Peacock";
+			case Board.PLUM: return "Professor Plum";
+			case Board.CANDLESTICK: return "Candlestick";
+			case Board.DAGGER: return "Dagger";
+			case Board.PIPE: return "Lead Pipe";
+			case Board.REVOLVER: return "Revolver";
+			case Board.ROPE: return "Rope";
+			case Board.SPANNER: return "Spanner";
+			case Board.KITCHEN: return "Kitchen";
+			case Board.BALLROOM: return "Ballroom";
+			case Board.CONSERVATORY: return "Conservatory";
+			case Board.BILLARD: return "Billiard Room";
+			case Board.LIBRARY: return "Library";
+			case Board.STUDY: return "Study";
+			case Board.HALL: return "Hall";
+			case Board.LOUNGE: return "Lounge";
+			case Board.DINING: return "Dining Room";
+			default: return null;
+		}
+	}
+	
+	/**
+	 * Turns the integer values used within the program into the string that 
+	 * is its name.
+	 * @param gamePart the string related to the component
+	 */
+	public static int  asInt (String gamePart) {
+		switch (gamePart) {
+			case "Miss Scarlett": return Board.SCARLETT;
+			case "Colonel Mustard": return Board.MUSTARD;
+			case "Mrs White": return Board.WHITE;
+			case "Rev Green": return Board.GREEN;
+			case "Miss Peacock": return Board.PEACOCK;
+			case "Professor Plum": return Board.PLUM;
+			case "Candlestick": return Board.CANDLESTICK;
+			case "Dagger": return Board.DAGGER;
+			case "Lead Pipe": return Board.PIPE;
+			case "Revolver": return Board.REVOLVER;
+			case "Rope": return Board.ROPE;
+			case "Spanner": return Board.SPANNER;
+			case "Kitchen": return Board.KITCHEN;
+			case "Ballroom": return Board.BALLROOM;
+			case "Conservatory": return Board.CONSERVATORY;
+			case "Billiard Room": return Board.BILLARD;
+			case "Library": return Board.LIBRARY;
+			case "Study": return Board.STUDY;
+			case "Hall": return Board.HALL;
+			case "Lounge": return Board.LOUNGE;
+			case "Dining Room": return Board.DINING;
+			default: return 0;
+		}
+	}
+	
+	@Override
+	public void mousePressed(MouseEvent e) {
+	}
 
-	// @Override
-	// public void keyTyped(KeyEvent e) {
-	// // TODO Auto-generated method stub
-	//
-	// }
-	//
-	// @Override
-	// public void keyPressed(KeyEvent e) {
-	// // TODO Auto-generated method stub
-	//
-	// }
-	//
-	// @Override
-	// public void keyReleased(KeyEvent e) {
-	// // TODO Auto-generated method stub
-	//
-	// }
+	@Override
+	public void mouseReleased(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+	}
 
 }

@@ -30,7 +30,6 @@ public class BoardCanvas extends JPanel{
 	private Color highlightCol = new Color(0, 255, 0, 100);
 
 	private List<Coordinate> highlighted = new ArrayList<Coordinate>();
-	//private Map<Integer, Coordinate> tokens;
 	private Map<Integer, Color> colors;
 
 	private Board game;
@@ -53,16 +52,8 @@ public class BoardCanvas extends JPanel{
 			squareWidth = 25.38;
 		}
 
-		//tokens = new HashMap<Integer, Coordinate>();
 		colors = new HashMap<Integer, Color>();
-		// FOR NOW TODO use a getPosition(playerInt) method
-//		tokens.put(Board.SCARLETT, game.getPlayerCoords(Board.SCARLETT));
-//		tokens.put(Board.MUSTARD, game.getPlayerCoords(Board.MUSTARD));
-//		tokens.put(Board.WHITE, game.getPlayerCoords(Board.WHITE));
-//		tokens.put(Board.GREEN, game.getPlayerCoords(Board.GREEN));
-//		tokens.put(Board.PEACOCK, game.getPlayerCoords(Board.PEACOCK));
-//		tokens.put(Board.PLUM, game.getPlayerCoords(Board.PLUM));
-
+		
 		colors.put(Board.SCARLETT, Color.red.darker());
 		colors.put(Board.MUSTARD, new Color (245,198,76));
 		colors.put(Board.WHITE, Color.white);
