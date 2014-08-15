@@ -188,6 +188,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 				if (game.getRoom() != Board.NOTHING) {
 					int guess = new SuggestDialog(game.getRoom()).getGuess();
 					if (game.suggest(guess)) {
+						canvas.repaint();
 						// TODO refuting
 					}
 				}

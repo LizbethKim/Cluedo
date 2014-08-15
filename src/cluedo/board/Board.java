@@ -241,7 +241,7 @@ public class Board {
 	/**
 	 *
 	 * @param suggestion
-	 * @return SUCCESS if a correct guess, FAIL if incorrect, nothing if the
+	 * @return SUCCESS if a correct guess, FAIL if incorrect, NOTHING if the
 	 * guess was an invalid guess or made at an invalid time.
 	 */
 	public int accuse(int suggestion){

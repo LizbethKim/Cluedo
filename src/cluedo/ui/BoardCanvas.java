@@ -34,6 +34,8 @@ public class BoardCanvas extends JPanel{
 	private Map<Integer, Color> colors;
 
 	private Board game;
+	List<Coordinate> shifts;
+	
 	/**
 	 * @param big Whether the boards should be large or not
 	 */
@@ -61,7 +63,20 @@ public class BoardCanvas extends JPanel{
 		colors.put(Board.GREEN, Color.green.darker().darker());
 		colors.put(Board.PEACOCK, Color.blue);
 		colors.put(Board.PLUM, new Color(150, 50 ,255));
-
+		
+		shifts = new ArrayList<Coordinate>();
+		shifts.add(new Coordinate(-1, 0));
+		shifts.add(new Coordinate(-2, 0));
+		shifts.add(new Coordinate(1, 0));
+		shifts.add(new Coordinate(0, -1));
+		shifts.add(new Coordinate(0, 1));
+		shifts.add(new Coordinate(-1, -1));
+		shifts.add(new Coordinate(-2, -1));
+		shifts.add(new Coordinate(1, -1));
+		shifts.add(new Coordinate(-1, 1));
+		shifts.add(new Coordinate(-2, 1));
+		shifts.add(new Coordinate(1, 1));		
+		
 		// TODO position weapons
 		try {
 		    boardPic = ImageIO.read(new File("assets/board.jpg"));
@@ -76,25 +91,38 @@ public class BoardCanvas extends JPanel{
 		g.fillRect(0, 0, width, height);
 		g.drawImage(boardPic, 1, 0, width, height, this);
 
-//		g.setColor(Color.yellow);	TODO delete eventually
-//		for (double i = boardTop; i < height; i += squareWidth) {
-//			g.drawLine(0, (int)i, width, (int)i);
+		// TODO make path highlighting
+//		g.setColor(highlightCol);
+//		for (Coordinate c: highlighted) {
+//			g.fillRect(boardLeft + (int)(squareWidth*c.getX()) - 1, boardTop + (int)(squareWidth*c.getY()) - 1, (int)squareWidth + 2, (int)squareWidth + 2);
 //		}
-//		for (double i = boardLeft; i < width; i += squareWidth) {
-//			g.drawLine((int)i, 0, (int)i, height);
-//		}
-
-		g.setColor(highlightCol);
-		for (Coordinate c: highlighted) {
-			g.fillRect(boardLeft + (int)(squareWidth*c.getX()) - 1, boardTop + (int)(squareWidth*c.getY()) - 1, (int)squareWidth + 2, (int)squareWidth + 2);
-		}
-
+		List<Coordinate> used = new ArrayList<Coordinate>();
 		for (int chara : colors.keySet()) {
 			g.setColor(colors.get(chara));
 			Coordinate c = game.getPlayerCoords(chara);
-			g.fillOval(boardLeft + (int)(squareWidth*c.getX()) + 4, boardTop + (int)(squareWidth*c.getY()) + 4, (int)squareWidth - 8, (int)squareWidth - 8);
+			int room = game.getRoom(c);
+			if (room == Board.NOTHING || !used.contains(c)) {
+				g.fillOval(boardLeft + (int)(squareWidth*c.getX()) + 4, boardTop + (int)(squareWidth*c.getY()) + 4, (int)squareWidth - 8, (int)squareWidth - 8);
+				g.setColor(Color.black);
+				g.drawOval(boardLeft + (int)(squareWidth*c.getX()) + 4, boardTop + (int)(squareWidth*c.getY()) + 4, (int)squareWidth - 8, (int)squareWidth - 8);
+				used.add(c);
+			} else {
+				// this deals with spreading players out within rooms
+				for (Coordinate shift: shifts) {
+					Coordinate shifted = Coordinate.addCoords(c, shift);
+					if (!used.contains(shifted) && game.getRoom(shifted) == room) {
+						c = shifted;
+						break;
+					}
+				}
+				g.fillOval(boardLeft + (int)(squareWidth*c.getX()) + 4, boardTop + (int)(squareWidth*c.getY()) + 4, (int)squareWidth - 8, (int)squareWidth - 8);
+				g.setColor(Color.black);
+				g.drawOval(boardLeft + (int)(squareWidth*c.getX()) + 4, boardTop + (int)(squareWidth*c.getY()) + 4, (int)squareWidth - 8, (int)squareWidth - 8);
+				used.add(c);
+			}
+			
 		}
-
+		
 	}
 
 

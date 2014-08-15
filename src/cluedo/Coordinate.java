@@ -16,6 +16,16 @@ public class Coordinate {
 	public int getY() {
 		return y;
 	}
+	
+	/**
+	 * Adds two coordinates together and returns the result.
+	 * @param one
+	 * @param two
+	 * @return
+	 */
+	public static Coordinate addCoords(Coordinate one, Coordinate two) {
+		return new Coordinate(one.x + two.x, one.y + two.y);
+	}
 
 	@Override
 	public int hashCode() {
@@ -40,5 +50,10 @@ public class Coordinate {
 		if (y != other.y)
 			return false;
 		return true;
+	}
+	
+	public String toString() {
+		return "(" + x + ", " + y + ")";
+		
 	}
 }
