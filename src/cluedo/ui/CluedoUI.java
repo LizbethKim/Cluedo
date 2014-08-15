@@ -198,6 +198,8 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 				if (result == Board.SUCCESS) {
 					// TODO end the game with a win
 				} else if (result == Board.FAIL) {
+					JOptionPane.showMessageDialog(this, "Incorrect guess, you lose!");
+					JOptionPane.showMessageDialog(this, players.get(game.currentPlayer()) + " has lost and may no longer play except to refute.");
 					// TODO display losing message
 				} else {
 					// TODO maybe display message?

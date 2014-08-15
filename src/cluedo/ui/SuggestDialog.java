@@ -13,7 +13,7 @@ public class SuggestDialog {
 	private JComboBox<String> characters;
 	private JComboBox<String> weapons;
 	private JComboBox<String> rooms;
-	private Boolean accusation;
+	private boolean accusation;
 	/**
 	 * @param room is the room that the suggestion is being made from. 
 	 * 0 if this is an accusation
