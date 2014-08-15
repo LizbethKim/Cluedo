@@ -57,13 +57,13 @@ public class Tests {
 		board.addPlayer(1);
 		board.startGame();
 		board.rollDice(2);
-		assertTrue(board.move(new Coordinate(7, 22)) == 7); //7 is the success enum
+		assertTrue(board.move(new Coordinate(7, 22)) == board.SUCCESS); //7 is the success enum
 		board.nextTurn();
 		board.rollDice(2);
-		assertTrue(board.move(new Coordinate(7, 19)) == 9); //9 is the fail enum
+		assertTrue(board.move(new Coordinate(7, 19)) == board.FAIL); //9 is the fail enum
 		board.nextTurn();
 		board.rollDice(2);
-		assertTrue(board.move(new Coordinate(7, 23)) == 0); //0 is the NOTHING enum, means there's still more moves to go.
+		assertTrue(board.move(new Coordinate(7, 23)) == board.NOTHING); //0 is the NOTHING enum, means there's still more moves to go.
 	}
 
 	@Test
@@ -82,11 +82,11 @@ public class Tests {
 	@Test
 	public void testMiddleRoom(){
 		Board board = makeBoard();
-		assertTrue(board.getRoom(new Coordinate(11, 10)) == 1000); //Middle room detection
+		assertTrue(board.getRoom(new Coordinate(11, 10)) == board.MIDDLE); //Middle room detection
 		board.addPlayer(1);
 		board.startGame();
 		board.rollDice(100);
-		assertTrue(board.move(new Coordinate(11, 10)) == 9);
+		assertTrue(board.move(new Coordinate(11, 10)) == board.FAIL);
 	}
 
 	@Test
@@ -95,7 +95,7 @@ public class Tests {
 		board.addPlayer(1);
 		board.startGame();
 		int solution = board.getSoln();
-		assertTrue(board.accuse(solution) == 7);
+		assertTrue(board.accuse(solution) == board.SUCCESS);
 	}
 
 	@Test
@@ -105,8 +105,8 @@ public class Tests {
 		board.startGame();
 		int solution = board.getSoln();
 		assertTrue(board.accuse(994) == 0);
-		if (solution != 444) assertTrue(board.accuse(444) == 9);
-		else{assertTrue(board.accuse(443) == 9);}
+		if (solution != 444) assertTrue(board.accuse(444) == board.FAIL);
+		else{assertTrue(board.accuse(443) == board.FAIL);}
 		board.nextTurn();
 		assertTrue(board.getState() == 5);
 	}
@@ -121,6 +121,24 @@ public class Tests {
 		assertTrue(board.getPlayerCards(1).size() == 6);
 		assertTrue(board.getPlayerCards(2).size() == 6);
 		assertTrue(board.getPlayerCards(3).size() == 6);
+	}
+	
+	@Test
+	public void testRoomEntryExit(){
+		Board board = makeBoard();
+		board.addPlayer(1);
+		board.startGame();
+		board.rollDice(100);
+		List<Coordinate> rooms = board.getRoomCoords();
+		assertTrue(board.move(rooms.get(1)) == board.SUCCESS);
+		assertTrue(board.getCurrentPlayer().currentRoom() == 100);
+		board.nextTurn();
+		board.rollDice(100);
+		assertTrue(board.move(rooms.get(6)) == board.SUCCESS);
+		assertTrue(board.getCurrentPlayer().currentRoom() == 600);
+		board.nextTurn();
+		board.rollDice(100);
+		assertTrue(board.move(rooms.get(6)) == board.FAIL);
 	}
 
 

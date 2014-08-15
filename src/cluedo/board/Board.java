@@ -149,7 +149,7 @@ public class Board {
 		cardDistribution();
 		return true;
 	}
-	
+
 	public List<Integer> getPlayerCards(int chara){
 		List<Integer> list = new ArrayList<Integer>();
 		for (Card c:playerList.get(chara - 1).getCards()){
@@ -239,9 +239,9 @@ public class Board {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param suggestion
-	 * @return SUCCESS if a correct guess, FAIL if incorrect, nothing if the 
+	 * @return SUCCESS if a correct guess, FAIL if incorrect, nothing if the
 	 * guess was an invalid guess or made at an invalid time.
 	 */
 	public int accuse(int suggestion){
@@ -412,7 +412,7 @@ public class Board {
 			start = playerList.get(currentPlayer).getCoords(); //Otherwise start position is the current coords
 		}
 		if (board[endPoint.getX()][endPoint.getY()] instanceof Room){
-			if (board[start.getX()][start.getY()] instanceof Room) return FAIL;
+			if (board[start.getX()][start.getY()].equals(board[endPoint.getX()][endPoint.getY()])) return FAIL;
 			Room endRoom = (Room) board[endPoint.getX()][endPoint.getY()];
 			endPoint = bestExit(endRoom, start);
 		}
@@ -424,13 +424,14 @@ public class Board {
 			temp = temp.getParent();
 		}
 		if (board[endPoint.getX()][endPoint.getY()] instanceof Room){
-			//Sets Player's coordinates to the middle of the Room, <3 Kelsey Please don't hate me :( TODO
+			//Sets Player's coordinates to the middle of the Room, <3 Kelsey Please don't hate me :(
 			playerList.get(currentPlayer).setCoords(roomCoords.get(convertRoom(((Room) board[endPoint.getX()][endPoint.getY()]).getName())));
 			playerList.get(currentPlayer).setRoom(((Room) board[endPoint.getX()][endPoint.getY()]).getName());
 			currentMove = 0;
 		} else {
 			currentMove -= path.getLength(); //Removes the distance traveled from the move pool
 			playerList.get(currentPlayer).setCoords(endPoint); //Updates player coordinates
+			playerList.get(currentPlayer).setRoom(NOTHING);
 		}
 		if (currentMove == 0) { //If no more movement is possible, moves the state and returns success
 			moveState();
