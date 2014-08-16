@@ -162,7 +162,7 @@ public class Board {
 	public int currentPlayer(){
 		return playerList.get(currentPlayer).getChar();
 	}
-	
+
 	public int getRefutePlayer(){
 		return refutePlayer;
 	}
@@ -191,8 +191,8 @@ public class Board {
 		return playerCards;
 	}
 
-	
-	
+
+
 	//Must ensure Player's room is set correctly before attempting this
 	public boolean takePassage(){
 		if (currentState == 0){
@@ -232,7 +232,7 @@ public class Board {
 				accused.setCoords(roomCoords.get(convertRoom(suggestion)));
 				accused.setRoom(findRoom(suggestion));
 				this.currentSuggest = suggestion;
-				moveRefute();
+				refutePlayer = (currentPlayer + 1)%numPlayers;
 				moveState();
 				return true;
 			}
