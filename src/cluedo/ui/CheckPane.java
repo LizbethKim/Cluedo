@@ -35,7 +35,6 @@ public class CheckPane extends JPanel {
 			final JList<CheckableItem> list = new JList<CheckableItem>(createData(cardNames));
 			list.setCellRenderer(new CheckListRenderer());
 			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			//list.setBorder(new EmptyBorder(0, 4, 0, 0));
 			list.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 			    int index = list.locationToIndex(e.getPoint());
@@ -129,5 +128,27 @@ public class CheckPane extends JPanel {
           return this;
         }
       }
+
+	public void restart() {
+		lists = new HashMap<Integer, JList<CheckableItem>>();
+		for (int i = 1; i < 7; i++) {
+			final JList<CheckableItem> list = new JList<CheckableItem>(createData(cardNames));
+			list.setCellRenderer(new CheckListRenderer());
+			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			list.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+			    int index = list.locationToIndex(e.getPoint());
+			    CheckableItem item = (CheckableItem) list.getModel()
+			        .getElementAt(index);
+			    item.setSelected(!item.isSelected());
+			    Rectangle rect = list.getCellBounds(index, index);
+			    list.repaint(rect);
+			  }
+			});
+			
+			lists.put(i, list);
+		}
+		this.currentPlayer = 1;
+	}
     
 }

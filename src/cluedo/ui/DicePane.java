@@ -1,7 +1,9 @@
 package cluedo.ui;
 
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.File;
@@ -23,7 +25,7 @@ public class DicePane extends JPanel {
 	private Random r;
 	private int d1 = 6;
 	private int d2 = 6;
-	
+	private boolean rolled;
 
 	private final int width = 130;
 	private final int height = 190;
@@ -63,12 +65,20 @@ public class DicePane extends JPanel {
 		return d1 + d2;
 	}
 	
-	
-	
+	public void setRolled(boolean rolled) {
+		this.rolled = rolled;
+		repaint();
+	}
 	
 	protected void paintComponent(Graphics g) {
+		g.clearRect(0, 0, width, height);
 		g.drawImage(dice.get(d1), dLeft, d1Top, dieSize, dieSize, this);
 		g.drawImage(dice.get(d2), dLeft, d2Top, dieSize, dieSize, this);
+		if (!rolled) {
+			g.setFont(new Font(getFont().getFontName(), Font.BOLD, getFont().getSize() + 3));
+			g.setColor(Color.orange);
+			g.drawString("click to roll", dLeft - 10, d2Top - 5);
+		}
 	}
 
 	@Override
@@ -76,14 +86,19 @@ public class DicePane extends JPanel {
 		return new Dimension(width,height);
 	}
 	
-	public int getWidth() {
-		return width;
-	}
+//	public int getWidth() {
+//		return width;
+//	}
+//
+//	public int getHeight() {
+//		return height;
+//	}
 
 
-
-	public int getHeight() {
-		return height;
+	public void restart() {
+		d1 = 6;
+		d2 = 6;
+		this.rolled = false;
 	}
 	
 }

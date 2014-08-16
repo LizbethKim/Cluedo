@@ -57,12 +57,12 @@ public class BoardCanvas extends JPanel{
 
 		colors = new HashMap<Integer, Color>();
 		
-		colors.put(Board.SCARLETT, Color.red.darker());
-		colors.put(Board.MUSTARD, new Color (245,198,76));
+		colors.put(Board.SCARLETT, Color.red);
+		colors.put(Board.MUSTARD, new Color (255,205,90));
 		colors.put(Board.WHITE, Color.white);
-		colors.put(Board.GREEN, Color.green.darker().darker());
-		colors.put(Board.PEACOCK, Color.blue);
-		colors.put(Board.PLUM, new Color(150, 50 ,255));
+		colors.put(Board.GREEN, Color.green.darker());
+		colors.put(Board.PEACOCK, Color.blue.brighter());
+		colors.put(Board.PLUM, new Color(170, 70 ,255));
 		
 		shifts = new ArrayList<Coordinate>();
 		shifts.add(new Coordinate(-1, 0));
@@ -98,13 +98,14 @@ public class BoardCanvas extends JPanel{
 //		}
 		List<Coordinate> used = new ArrayList<Coordinate>();
 		for (int chara : colors.keySet()) {
-			g.setColor(colors.get(chara));
+			
 			Coordinate c = game.getPlayerCoords(chara);
 			int room = game.getRoom(c);
 			if (room == Board.NOTHING || !used.contains(c)) {
-				g.fillOval(boardLeft + (int)(squareWidth*c.getX()) + 4, boardTop + (int)(squareWidth*c.getY()) + 4, (int)squareWidth - 8, (int)squareWidth - 8);
 				g.setColor(Color.black);
-				g.drawOval(boardLeft + (int)(squareWidth*c.getX()) + 4, boardTop + (int)(squareWidth*c.getY()) + 4, (int)squareWidth - 8, (int)squareWidth - 8);
+				g.fillOval(boardLeft + (int)(squareWidth*c.getX()) + 2, boardTop + (int)(squareWidth*c.getY()) + 2, (int)squareWidth - 4, (int)squareWidth - 4);
+				g.setColor(colors.get(chara));
+				g.fillOval(boardLeft + (int)(squareWidth*c.getX()) + 4, boardTop + (int)(squareWidth*c.getY()) + 4, (int)squareWidth - 8, (int)squareWidth - 8);
 				used.add(c);
 			} else {
 				// this deals with spreading players out within rooms
@@ -115,9 +116,10 @@ public class BoardCanvas extends JPanel{
 						break;
 					}
 				}
-				g.fillOval(boardLeft + (int)(squareWidth*c.getX()) + 4, boardTop + (int)(squareWidth*c.getY()) + 4, (int)squareWidth - 8, (int)squareWidth - 8);
 				g.setColor(Color.black);
-				g.drawOval(boardLeft + (int)(squareWidth*c.getX()) + 4, boardTop + (int)(squareWidth*c.getY()) + 4, (int)squareWidth - 8, (int)squareWidth - 8);
+				g.fillOval(boardLeft + (int)(squareWidth*c.getX()) + 2, boardTop + (int)(squareWidth*c.getY()) + 2, (int)squareWidth - 4, (int)squareWidth - 4);
+				g.setColor(colors.get(chara));				
+				g.fillOval(boardLeft + (int)(squareWidth*c.getX()) + 4, boardTop + (int)(squareWidth*c.getY()) + 4, (int)squareWidth - 8, (int)squareWidth - 8);
 				used.add(c);
 			}
 			
@@ -161,6 +163,12 @@ public class BoardCanvas extends JPanel{
 
 	public int getBoardHeight() {
 		return height;
+	}
+
+	public void restart(Board game) {
+		this.game = game;
+		highlighted = new ArrayList<Coordinate>();
+		
 	}
 
 }

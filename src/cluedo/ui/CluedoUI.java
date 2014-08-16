@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -28,6 +29,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import cluedo.Coordinate;
+import cluedo.Main;
 import cluedo.board.Board;
 
 
@@ -55,18 +57,10 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 //	private Map<Integer, String> characters;
 	private Map<Integer, String> players;
 
-	public static boolean go;	// FIXME!!!
 
 	public CluedoUI(Board game) {
 		super("Cluedo");
 		this.game = game;
-//		characters = new HashMap<Integer, String>();
-//		characters.put(Board.SCARLETT, "Miss Scarlett");
-//		characters.put(Board.MUSTARD, "Colonel Mustard");
-//		characters.put(Board.WHITE, "Mrs White");
-//		characters.put(Board.GREEN, "Rev Green");
-//		characters.put(Board.PEACOCK, "Miss Peacock");
-//		characters.put(Board.PLUM, "Professor Plum");
 		players = new HashMap<Integer, String>();
 
 		// Set up the menus
@@ -82,13 +76,8 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 
 		});
 		JMenuItem restart = new JMenuItem("Restart");
-		restart.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO make new model? eg
-			}
-
-		});
+		restart.setActionCommand("Restart");
+		restart.addActionListener(this);
 		gameOptionMenu.add(restart);
 		gameOptionMenu.add(quit);
 		JMenu fileOptionMenu = new JMenu("File");
@@ -141,37 +130,37 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		addMouseListener(this);
 
 		bottomPaneTop = canvas.getHeight() + boardCanvasTop;
-//		checkPaneLeft = canvas.getWidth();
-
-		JPanel panel = new JPanel();
-		panel.add(new JLabel("How many players?"));
-		DefaultComboBoxModel<Integer> model = new DefaultComboBoxModel<Integer>();
-		model.addElement(3);
-		model.addElement(4);
-		model.addElement(5);
-		model.addElement(6);
-		JComboBox<Integer> comboBox = new JComboBox<Integer>(model);
-		panel.add(comboBox);
-		
-		JOptionPane.showMessageDialog(this, panel, "Welcome to Cluedo!", JOptionPane.PLAIN_MESSAGE);
-
-		
-		SelectPlayerDialog s = new SelectPlayerDialog(this, players, (int)comboBox.getSelectedItem());
-		while(!s.done()) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e1) {
-				System.out.println(e1);
-				e1.printStackTrace();
-			}
-		}
-		s.dispose();
-		
-		// FIXME executes before dialog finishes
-		for (Integer p: players.keySet()) {
-			game.addPlayer(p);
-		}
-		game.startGame();
+////		checkPaneLeft = canvas.getWidth();
+//
+//		JPanel panel = new JPanel();
+//		panel.add(new JLabel("How many players?"));
+//		DefaultComboBoxModel<Integer> model = new DefaultComboBoxModel<Integer>();
+//		model.addElement(3);
+//		model.addElement(4);
+//		model.addElement(5);
+//		model.addElement(6);
+//		JComboBox<Integer> comboBox = new JComboBox<Integer>(model);
+//		panel.add(comboBox);
+//		
+//		JOptionPane.showMessageDialog(this, panel, "Welcome to Cluedo!", JOptionPane.PLAIN_MESSAGE);
+//
+//		
+//		SelectPlayerDialog s = new SelectPlayerDialog(this, players, (int)comboBox.getSelectedItem());
+//		while(!s.done()) {
+//			try {
+//				Thread.sleep(100);
+//			} catch (InterruptedException e1) {
+//				System.out.println(e1);
+//				e1.printStackTrace();
+//			}
+//		}
+//		s.dispose();
+//		
+//		for (Integer p: players.keySet()) {
+//			game.addPlayer(p);
+//		}
+//		game.startGame();
+		this.restart(game);
 	}
 
 
@@ -200,6 +189,19 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 				} else if (result == Board.FAIL) {
 					JOptionPane.showMessageDialog(this, "Incorrect guess, you lose!");
 					JOptionPane.showMessageDialog(this, players.get(game.currentPlayer()) + " has lost and may no longer play except to refute.");
+					if (game.getState() == 5) {
+						JOptionPane.showMessageDialog(this, "Game over!");
+						int playAgain = JOptionPane.showConfirmDialog(this, "Play again?", "", JOptionPane.YES_NO_OPTION);
+						if (playAgain == JOptionPane.YES_OPTION) {
+							try {
+								this.restart(Main.createBoardFromFile("Board.txt"));
+							} catch (IOException err) {
+								System.out.println(e);
+							}
+						} else {
+							System.exit(0);
+						}
+					}
 					// TODO display losing message
 				} else {
 					// TODO maybe display message?
@@ -211,14 +213,18 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		// Dice roll
 		} else if (dicePane.contains(e.getX(), e.getY() - bottomPaneTop) && game.getState() == 0) {
 			int newRoll = dicePane.rollDice();
+			dicePane.setRolled(true);
 			game.rollDice(newRoll);
 		}
+		
+		
 
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("End Turn")) {
+			dicePane.setRolled(false);
 			game.nextTurn();
 			currentPlayer = game.currentPlayer();
 			list.setPlayer(0);
@@ -264,8 +270,54 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			} catch (FileNotFoundException err) {
 				System.out.println(err);
 			}
+		} else if (e.getActionCommand().equals("Restart")) {
+			try {
+				this.restart(Main.createBoardFromFile("Board.txt"));
+			} catch (IOException err) {
+				System.out.println(err);
+			}
 		}
 
+	}
+	
+	private void restart(Board game) {
+		
+		this.game = game;
+		this.canvas.restart(game);
+		this.dicePane.restart();
+		this.cardCanvas.restart();
+		this.list.restart();
+		this.currentPlayer = 1;
+		players = new HashMap<Integer, String>();
+		
+		JPanel panel = new JPanel();
+		panel.add(new JLabel("How many players?"));
+		DefaultComboBoxModel<Integer> model = new DefaultComboBoxModel<Integer>();
+		model.addElement(3);
+		model.addElement(4);
+		model.addElement(5);
+		model.addElement(6);
+		JComboBox<Integer> comboBox = new JComboBox<Integer>(model);
+		panel.add(comboBox);
+		
+		JOptionPane.showMessageDialog(this, panel, "Welcome to Cluedo!", JOptionPane.PLAIN_MESSAGE);
+
+		
+		SelectPlayerDialog s = new SelectPlayerDialog(this, players, (int)comboBox.getSelectedItem());
+		while(!s.done()) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e1) {
+				System.out.println(e1);
+				e1.printStackTrace();
+			}
+		}
+		s.dispose();
+		
+		for (Integer p: players.keySet()) {
+			game.addPlayer(p);
+		}
+		game.startGame();	
 	}
 	
 	/**
@@ -331,6 +383,8 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			default: return 0;
 		}
 	}
+	
+	
 	
 	@Override
 	public void mousePressed(MouseEvent e) {

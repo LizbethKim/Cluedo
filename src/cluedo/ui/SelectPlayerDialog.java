@@ -31,7 +31,7 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 	private ButtonGroup group;
 	private JPanel whole;
 	private String selectedPlayer = "Miss Scarlett";
-	private int leftToChoose;
+	private int numToChoose;
 	
 	private boolean done;
 
@@ -39,7 +39,7 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 		super(f, "Select a Character");
 		this.done = false;
 		this.playerInfo = playerInfo;
-		leftToChoose = numPlayers;
+		numToChoose = numPlayers;
 		this.buttons = new HashMap<String, ButtonRow>();
 
 		for (int i = 1; i < 7; i++) {
@@ -98,12 +98,10 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 						}
 					}
 				playerInfo.put(character, text);
-				leftToChoose--;
 				buttons.get(selectedPlayer).greyOut();
-				if (leftToChoose <= 0) {
+				if (playerInfo.size() == numToChoose) {
 					this.done = true;
 				}
-				// FIXME pressing ok twice in a row counts as two!!
 			}
 		} else {
 			buttons.get(selectedPlayer).showTextPane(false);

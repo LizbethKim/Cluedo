@@ -92,4 +92,8 @@ public class CardCanvas extends JPanel {
 	public Dimension getPreferredSize() {
 		return new Dimension(width,height);
 	}
+
+	public void restart() {
+		cardsToDisplay = new ArrayList<Integer>();
+	}
 }
