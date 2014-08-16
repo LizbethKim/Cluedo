@@ -115,7 +115,7 @@ public class Tests {
 	}
 	
 	@Test
-	public void testCardSize(){
+	public void testCardSize_1(){
 		Board board = makeBoard();
 		board.addPlayer(1);
 		board.addPlayer(2);
@@ -124,6 +124,24 @@ public class Tests {
 		assertTrue(board.getPlayerCards(1).size() == 6);
 		assertTrue(board.getPlayerCards(2).size() == 6);
 		assertTrue(board.getPlayerCards(6).size() == 6);
+	}
+	
+	@Test
+	public void testCardSize_2(){
+		Board board = makeBoard();
+		board.addPlayer(1);
+		board.addPlayer(2);
+		board.addPlayer(3);
+		board.addPlayer(4);
+		board.addPlayer(5);
+		board.addPlayer(6);
+		board.startGame();
+		assertTrue(board.getPlayerCards(1).size() == 3);
+		assertTrue(board.getPlayerCards(2).size() == 3);
+		assertTrue(board.getPlayerCards(3).size() == 3);
+		assertTrue(board.getPlayerCards(4).size() == 3);
+		assertTrue(board.getPlayerCards(5).size() == 3);
+		assertTrue(board.getPlayerCards(6).size() == 3);
 	}
 	
 	@Test
