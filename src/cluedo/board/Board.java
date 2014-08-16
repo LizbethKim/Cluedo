@@ -152,10 +152,15 @@ public class Board {
 
 	public List<Integer> getPlayerCards(int chara){
 		List<Integer> list = new ArrayList<Integer>();
-		for (Card c:playerList.get(chara - 1).getCards()){
-			list.add(c.getCard());
+		for (Player p:playerList){
+			if (p.getChar() == chara){
+				for (Card c:p.getCards()){
+					list.add(c.getCard());
+				}
+				return list;
+			}
 		}
-		return list;
+		return null;
 	}
 
 	//Returns the character ENUM for the current player
@@ -311,26 +316,21 @@ public class Board {
 		if (cardNum == 0) {
 			moveRefute();
 			if (refutePlayer == currentPlayer){
-				nextTurn();
 				return SUCCESS;
 			}
 			return NOTHING;
 		}
 		if (playerList.get(refutePlayer).hasCard(cardNum)){
 			if (findRoom(currentSuggest) == findRoom(cardNum)) {
-				nextTurn();
 				return findRoom(currentSuggest);
 			} else if (findWeapon(currentSuggest) == findWeapon(cardNum)){
-				nextTurn();
 				return findWeapon(currentSuggest);
 			} else if (findChar(currentSuggest) == findChar(cardNum)){
-				nextTurn();
 				return findChar(currentSuggest);
 			}
 		}
 		moveRefute();
 		if (refutePlayer == currentPlayer){
-			nextTurn();
 			return SUCCESS;
 		}
 		return INVALIDCARD;
