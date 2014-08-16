@@ -162,6 +162,10 @@ public class Board {
 	public int currentPlayer(){
 		return playerList.get(currentPlayer).getChar();
 	}
+	
+	public int getRefutePlayer(){
+		return refutePlayer;
+	}
 
 	//Returns the player coords of the player ENUM
 	public Coordinate getPlayerCoords(int player){
@@ -187,6 +191,8 @@ public class Board {
 		return playerCards;
 	}
 
+	
+	
 	//Must ensure Player's room is set correctly before attempting this
 	public boolean takePassage(){
 		if (currentState == 0){

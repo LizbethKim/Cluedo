@@ -3,6 +3,7 @@ package cluedo.ui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.awt.event.ActionEvent;
@@ -150,11 +151,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 				infoPane.displayMovesLeft(game.getMovesLeft());
 				canvas.repaint();
 				if (moveResult == Board.SUCCESS && game.getRoom() != Board.NOTHING) {
-					int guess = new SuggestDialog(game.getRoom()).getGuess();
-					if (game.suggest(guess)) {
-						canvas.repaint();
-						// TODO refuting
-					}
+					this.doSuggestion();
 				}
 			} else if (game.getState() == 0 && game.getRoom(c) == Board.MIDDLE) {
 				int guess = new SuggestDialog(0).getGuess();
@@ -198,7 +195,10 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 							|| (game.getRoom() == Board.STUDY && game.getRoom(c) == Board.KITCHEN)
 							|| (game.getRoom() == Board.CONSERVATORY && game.getRoom(c) == Board.LOUNGE)
 							|| (game.getRoom() == Board.LOUNGE && game.getRoom(c) == Board.CONSERVATORY))) {
-				game.takePassage();
+				if (game.takePassage()) {
+					this.doSuggestion();
+					
+				}
 				canvas.repaint();
 			}
 		// Dice roll
@@ -226,45 +226,9 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			list.setPlayer(currentPlayer);
 			cardCanvas.updateCards(game.getPlayerCards());
 		} else if (e.getActionCommand().equals("Rules")) {
-			// Shows a window containing the rules
-			try {
-				JFrame ruleWindow = new JFrame();
-				ruleWindow.setPreferredSize(new Dimension(630, 700));
-				ruleWindow.setLayout(new BorderLayout());
-				Scanner sc = new Scanner(new File("assets/rules.txt"));
-				String text = sc.useDelimiter("\\Z").next();
-				sc.close();
-				JTextArea ta = new JTextArea(text);
-				JScrollPane sp = new JScrollPane(ta);
-				sp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-				ruleWindow.add(sp, BorderLayout.CENTER);
-				ruleWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				ruleWindow.pack();
-				ruleWindow.setResizable(false);
-				ruleWindow.setVisible(true);
-			} catch (FileNotFoundException err) {
-				System.out.println(err);
-			}
+			this.showRules();
 		} else if (e.getActionCommand().equals("Help")) {
-			// Shows a window with instructions
-			try {
-				JFrame ruleWindow = new JFrame();
-				ruleWindow.setPreferredSize(new Dimension(460, 400));
-				ruleWindow.setLayout(new BorderLayout());
-				Scanner sc = new Scanner(new File("assets/help.txt"));
-				String text = sc.useDelimiter("\\Z").next();
-				sc.close();
-				JTextArea ta = new JTextArea(text);
-				JScrollPane sp = new JScrollPane(ta);
-				sp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-				ruleWindow.add(sp, BorderLayout.CENTER);
-				ruleWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				ruleWindow.pack();
-				ruleWindow.setResizable(false);
-				ruleWindow.setVisible(true);
-			} catch (FileNotFoundException err) {
-				System.out.println(err);
-			}
+			this.showHelp();
 		} else if (e.getActionCommand().equals("Restart")) {
 			try {
 				this.restart(Main.createBoardFromFile("board.txt"));
@@ -272,8 +236,69 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 				System.out.println(err);
 			}
 		}
-
 	}
+	
+	private void showHelp() {
+		// Shows a window with instructions
+		try {
+			JFrame ruleWindow = new JFrame();
+			ruleWindow.setPreferredSize(new Dimension(460, 400));
+			ruleWindow.setLayout(new BorderLayout());
+			Scanner sc = new Scanner(new File("assets/help.txt"));
+			String text = sc.useDelimiter("\\Z").next();
+			sc.close();
+			JTextArea ta = new JTextArea(text);
+			JScrollPane sp = new JScrollPane(ta);
+			sp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+			ruleWindow.add(sp, BorderLayout.CENTER);
+			ruleWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			ruleWindow.pack();
+			ruleWindow.setResizable(false);
+			ruleWindow.setVisible(true);
+		} catch (FileNotFoundException err) {
+			System.out.println(err);
+		}
+	}
+	
+	private void showRules() {
+		// Shows a window with the rules
+		try {
+			JFrame ruleWindow = new JFrame();
+			ruleWindow.setPreferredSize(new Dimension(630, 700));
+			ruleWindow.setLayout(new BorderLayout());
+			Scanner sc = new Scanner(new File("assets/rules.txt"));
+			String text = sc.useDelimiter("\\Z").next();
+			sc.close();
+			JTextArea ta = new JTextArea(text);
+			JScrollPane sp = new JScrollPane(ta);
+			sp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+			ruleWindow.add(sp, BorderLayout.CENTER);
+			ruleWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			ruleWindow.pack();
+			ruleWindow.setResizable(false);
+			ruleWindow.setVisible(true);
+		} catch (FileNotFoundException err) {
+			System.out.println(err);
+		}
+	}
+	
+	private void doSuggestion() {
+		int guess = new SuggestDialog(game.getRoom()).getGuess();
+		if (game.suggest(guess)) {
+			canvas.repaint();
+			List<Integer> cardsToRefuteFrom = game.getPlayerCards(game.getRefutePlayer());
+			String[] cards = new String[cardsToRefuteFrom.size()];
+			for (int i = 0; i < cards.length; i++) {
+				cards[i] = asString(cardsToRefuteFrom.get(i));
+			}
+			JComboBox<String> comboBox = new JComboBox<String> (cards);
+			JPanel panel = new JPanel();
+			panel.add(new JLabel("Refute with which card?"));
+			//JOptionPane.showMessageDialog(this, message);
+			
+		}
+	}
+	
 	
 	/**
 	 * Starts the game passed in, shows initial setup dialog.
