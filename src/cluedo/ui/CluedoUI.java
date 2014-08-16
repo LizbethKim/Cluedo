@@ -17,7 +17,6 @@ import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -29,7 +28,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingWorker;
 
 import cluedo.Coordinate;
 import cluedo.Main;
@@ -155,6 +153,8 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 				canvas.repaint();
 				if (moveResult == Board.SUCCESS && game.getRoom() != Board.NOTHING) {
 					this.doSuggestion();
+				} else if (game.getMovesLeft() == 0) {
+					infoPane.showTurnEnd();
 				}
 			} else if (game.getState() == 0 && game.getRoom(c) == Board.MIDDLE) {
 				// An accusation is to be made
@@ -233,10 +233,12 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		if (game.suggest(guess)) {
 			canvas.repaint();
 			list.setPlayer(0);
+			infoPane.clear();
 			cardCanvas.updateCards(new ArrayList<Integer>());
 			this.refute(guess);
 			list.setPlayer(currentPlayer);
 			cardCanvas.updateCards(game.getPlayerCards());
+			infoPane.showTurnEnd();
 		}
 	}
 	
@@ -441,9 +443,9 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 	private class SuccessThread extends Thread {
         private Board game;
 		private SelectPlayerDialog s;
-		private JComboBox comboBox;
+		private JComboBox<Integer> comboBox;
 		
-        SuccessThread(Board game, JComboBox comboBox) {
+        SuccessThread(Board game, JComboBox<Integer> comboBox) {
             this.game = game;
             this.comboBox = comboBox;
         }
