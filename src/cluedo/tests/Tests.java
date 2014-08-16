@@ -63,8 +63,10 @@ public class Tests {
 		board.rollDice(2);
 		assertTrue(board.move(new Coordinate(7, 19)) == board.FAIL); //9 is the fail enum
 		board.nextTurn();
-		board.rollDice(2);
-		assertTrue(board.move(new Coordinate(7, 23)) == board.NOTHING); //0 is the NOTHING enum, means there's still more moves to go.
+		board.rollDice(5);
+		assertTrue(board.move(new Coordinate(7, 21)) == board.NOTHING); //0 is the NOTHING enum, means there's still more moves to go.
+		assertTrue(board.move(new Coordinate(7, 20)) == board.NOTHING);
+		assertTrue(board.move(new Coordinate(7, 17)) == board.SUCCESS);
 	}
 
 	@Test

@@ -336,7 +336,7 @@ public class Board {
 			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX(), coords.getY() + 1), depth+1, aStar);
 			current.addAll(temp);
 		}
-		if (coords.getY() - 1 >= 0 && aStar[coords.getX()+1][coords.getY()-1]){
+		if (coords.getY() - 1 >= 0 && aStar[coords.getX()][coords.getY()-1]){
 			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX(), coords.getY() - 1), depth+1, aStar);
 			current.addAll(temp);
 		}
