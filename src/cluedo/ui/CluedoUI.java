@@ -146,10 +146,10 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			int yCoord = (int) ((e.getY() - canvas.getBoardTop() - boardCanvasTop) / canvas.getSquareWidth());
 			Coordinate c = new Coordinate(xCoord, yCoord);
 			if (game.getState() == 1) {
-				game.move(c);
+				int moveResult = game.move(c);
 				infoPane.displayMovesLeft(game.getMovesLeft());
 				canvas.repaint();
-				if (game.getRoom() != Board.NOTHING) {
+				if (moveResult == Board.SUCCESS && game.getRoom() != Board.NOTHING) {
 					int guess = new SuggestDialog(game.getRoom()).getGuess();
 					if (game.suggest(guess)) {
 						canvas.repaint();
@@ -160,10 +160,22 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 				int guess = new SuggestDialog(0).getGuess();
 				int result = game.accuse(guess);
 				if (result == Board.SUCCESS) {
-					// TODO end the game with a win
+					if (game.getState() == 5) {
+						JOptionPane.showMessageDialog(this, "Game over, " + players.get(currentPlayer) + " won!");
+						int playAgain = JOptionPane.showConfirmDialog(this, "Play again?", "", JOptionPane.YES_NO_OPTION);
+						if (playAgain == JOptionPane.YES_OPTION) {
+							try {
+								this.restart(Main.createBoardFromFile("board.txt"));
+							} catch (IOException err) {
+								System.out.println(e);
+							}
+						} else {
+							System.exit(0);
+						}
+					}
 				} else if (result == Board.FAIL) {
 					JOptionPane.showMessageDialog(this, "Incorrect guess, you lose!");
-					JOptionPane.showMessageDialog(this, players.get(game.currentPlayer()) + " has lost and may no longer play except to refute.");
+					JOptionPane.showMessageDialog(this, players.get(currentPlayer) + " has lost and may no longer play except to refute.");
 					if (game.getState() == 5) {
 						JOptionPane.showMessageDialog(this, "Game over!");
 						int playAgain = JOptionPane.showConfirmDialog(this, "Play again?", "", JOptionPane.YES_NO_OPTION);
@@ -177,14 +189,18 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 							System.exit(0);
 						}
 					}
-					// TODO display losing message
 				} else {
-					// TODO maybe display message?
+					System.out.println("guess should not have been made");
 				}
 			
-			} //else if (game.getState() == 0 && something something corner room) {
-				//secret passage
-			//}
+			} else if (game.getState() == 0 && 
+					((game.getRoom() == Board.KITCHEN && game.getRoom(c) == Board.STUDY)
+							|| (game.getRoom() == Board.STUDY && game.getRoom(c) == Board.KITCHEN)
+							|| (game.getRoom() == Board.CONSERVATORY && game.getRoom(c) == Board.LOUNGE)
+							|| (game.getRoom() == Board.LOUNGE && game.getRoom(c) == Board.CONSERVATORY))) {
+				game.takePassage();
+				canvas.repaint();
+			}
 		// Dice roll
 		} else if (dicePane.contains(e.getX(), e.getY() - bottomPaneTop) && game.getState() == 0) {
 			int newRoll = dicePane.rollDice();
