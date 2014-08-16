@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -34,6 +36,7 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 	private int numToChoose;
 	
 	private boolean done;
+	public boolean initialised;
 
 	public SelectPlayerDialog(JFrame f, Map<Integer, String> playerInfo, int numPlayers) {
 		super(f, "Select a Character");
@@ -69,19 +72,20 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 	    for (ButtonRow br: buttons.values()) {
 	    	whole.add(br);
 	    }
+	    whole.add(Box.createRigidArea(new Dimension(0, 10)));
 	    whole.add(okPanel);
-	    whole.setPreferredSize(new Dimension(400, 175));
-	    whole.repaint();
-	    whole.validate();
+	    whole.setPreferredSize(new Dimension(400, 190));
+	    whole.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 	    
 
 	    add(whole);
+	    buttons.get("Miss Scarlett").showTextPane(true);
 	    setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		pack();
 		setResizable(false);
 		setLocationRelativeTo(f);
 		setVisible(true);
-		System.out.println(this);
+		initialised = true;
 	}
 
 	public boolean done() {

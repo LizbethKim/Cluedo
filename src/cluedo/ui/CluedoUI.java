@@ -46,6 +46,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 	private DicePane dicePane;
 	private CardCanvas cardCanvas;
 	private CheckPane list;
+	private InfoPane infoPane;
 
 	private final int boardCanvasTop = 45;
 	private final int bottomPaneTop;
@@ -100,10 +101,12 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		cardCanvas = new CardCanvas();
 		dicePane = new DicePane();
 		list = new CheckPane();
+		infoPane = new InfoPane();
 
 		JButton endTurn = new JButton("End Turn");
 		endTurn.setActionCommand("End Turn");
 		endTurn.addActionListener(this);
+		endTurn.setPreferredSize(new Dimension(150, 30));
 
 		JPanel south = new JPanel();
 		south.setLayout(new BorderLayout());
@@ -119,6 +122,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		right.setLayout(new BorderLayout(0, 20));
 		right.add(endTurn, BorderLayout.NORTH);
 		right.add(list, BorderLayout.CENTER);
+		right.add(infoPane, BorderLayout.SOUTH);
 
 		setLayout(new BorderLayout()); // use border layer
 		add(left, BorderLayout.WEST);
@@ -143,6 +147,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			Coordinate c = new Coordinate(xCoord, yCoord);
 			if (game.getState() == 1) {
 				game.move(c);
+				infoPane.displayMovesLeft(game.getMovesLeft());
 				canvas.repaint();
 				if (game.getRoom() != Board.NOTHING) {
 					int guess = new SuggestDialog(game.getRoom()).getGuess();
@@ -184,6 +189,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		} else if (dicePane.contains(e.getX(), e.getY() - bottomPaneTop) && game.getState() == 0) {
 			int newRoll = dicePane.rollDice();
 			dicePane.setRolled(true);
+			infoPane.displayMovesLeft(newRoll);
 			game.rollDice(newRoll);
 		}
 		
@@ -196,6 +202,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		if (e.getActionCommand().equals("End Turn")) {
 			dicePane.setRolled(false);
 			game.nextTurn();
+			infoPane.clear();
 			currentPlayer = game.currentPlayer();
 			list.setPlayer(0);
 			cardCanvas.updateCards(new ArrayList<Integer>());
@@ -203,6 +210,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			list.setPlayer(currentPlayer);
 			cardCanvas.updateCards(game.getPlayerCards());
 		} else if (e.getActionCommand().equals("Rules")) {
+			// Shows a window containing the rules
 			try {
 				JFrame ruleWindow = new JFrame();
 				ruleWindow.setPreferredSize(new Dimension(630, 700));
@@ -222,6 +230,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 				System.out.println(err);
 			}
 		} else if (e.getActionCommand().equals("Help")) {
+			// Shows a window with instructions
 			try {
 				JFrame ruleWindow = new JFrame();
 				ruleWindow.setPreferredSize(new Dimension(460, 400));
@@ -269,27 +278,54 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		
 		JPanel panel = new JPanel();
 		panel.add(new JLabel("How many players?"));
-		DefaultComboBoxModel<Integer> model = new DefaultComboBoxModel<Integer>();
-		model.addElement(3);
-		model.addElement(4);
-		model.addElement(5);
-		model.addElement(6);
-		JComboBox<Integer> comboBox = new JComboBox<Integer>(model);
+		final JComboBox<Integer> comboBox = new JComboBox<Integer>(new Integer[]{3, 4, 5, 6});
 		panel.add(comboBox);
 		
 		JOptionPane.showMessageDialog(this, panel, "Welcome to Cluedo!", JOptionPane.PLAIN_MESSAGE);
 
-		// FIXME doesn't actually show second time round.
-		SelectPlayerDialog s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
-		while(!s.done()) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e1) {
-				System.out.println(e1);
-				e1.printStackTrace();
+		
+		/*
+		 * LIZ LOOK HERE.
+		 * this is where there's the issue. I've tried fixing it by making a new
+		 * thread here, and it works fine the first time, but if you then go 
+		 * menu -> restart, it doesn't work. That's when it's called from
+		 * actionPerformed (one method up from here).
+		 */
+		Thread r = new Thread () {
+			private SelectPlayerDialog s;			
+			@Override
+			public void run() {
+				s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
+				while (!s.done()) {
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				s.dispose();
 			}
+		};
+		
+		r.start();
+		
+		try {
+			r.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-		s.dispose();
+		
+		// FIXME doesn't actually show second time round.
+//		SelectPlayerDialog s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
+//		while(!s.done()) {
+//			try {
+//				Thread.sleep(100);
+//			} catch (InterruptedException e1) {
+//				System.out.println(e1);
+//				e1.printStackTrace();
+//			}
+//		}
+//		s.dispose();
 		
 		for (Integer p: players.keySet()) {
 			game.addPlayer(p);

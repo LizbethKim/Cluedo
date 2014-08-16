@@ -424,7 +424,7 @@ public class Board {
 			temp = temp.getParent();
 		}
 		if (board[endPoint.getX()][endPoint.getY()] instanceof Room){
-			//Sets Player's coordinates to the middle of the Room, <3 Kelsey Please don't hate me :(
+			//Sets Player's coordinates to the middle of the Room
 			playerList.get(currentPlayer).setCoords(roomCoords.get(convertRoom(((Room) board[endPoint.getX()][endPoint.getY()]).getName())));
 			playerList.get(currentPlayer).setRoom(((Room) board[endPoint.getX()][endPoint.getY()]).getName());
 			currentMove = 0;

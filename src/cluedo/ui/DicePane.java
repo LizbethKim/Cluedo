@@ -83,7 +83,7 @@ public class DicePane extends JPanel {
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(width,height);
+		return new Dimension(width ,height);
 	}
 	
 //	public int getWidth() {

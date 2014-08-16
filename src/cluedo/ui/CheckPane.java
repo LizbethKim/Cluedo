@@ -104,7 +104,7 @@ public class CheckPane extends JPanel {
     
     @Override
 	public Dimension getPreferredSize() {
-		return new Dimension(200,700);
+		return new Dimension(200,586);
 	}
     
     
