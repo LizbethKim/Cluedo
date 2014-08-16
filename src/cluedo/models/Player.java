@@ -13,27 +13,37 @@ public class Player implements Comparable{
 	private List<Card> cards;
 	private int room;
 	private boolean playable;
-	
+	private boolean suggestable;
+
 	public Player(int character, int x, int y, boolean playable){
 		this.character = character;
 		cards = new ArrayList<Card>();
 		coords = new Coordinate(x, y);
 		room = Board.NOTHING;
 		this.playable = playable;
+		this.suggestable = false;
 	}
-	
+
 	public int getChar(){
 		return character;
 	}
-	
+
+	public boolean isSuggestable(){
+		return suggestable;
+	}
+
+	public void suggestable(boolean suggest){
+		suggestable = suggest;
+	}
+
 	public void remove(){
 		playable = false;
 	}
-	
+
 	public List<Card> getCards(){
 		return cards;
 	}
-	
+
 	public boolean hasCard(int card){
 		for (Card c: cards){
 			if (c.getCard() == card){
@@ -42,25 +52,25 @@ public class Player implements Comparable{
 		}
 		return false;
 	}
-	
+
 	public void addCard(Card card){
 		cards.add(card);
 	}
-	
+
 	public int currentRoom(){
 		return room;
 	}
-	
+
 	public void setRoom(int room){
 		this.room = room;
 	}
-	
+
 	@Override
 	public int compareTo(Object o) {
 		if (!(o instanceof Player)){throw new UnsupportedOperationException();}
 		return (int) Math.signum(this.character-((Player) o).getChar());
 	}
-	
+
 	public Coordinate getCoords(){
 		return coords;
 	}
@@ -81,5 +91,5 @@ public class Player implements Comparable{
 	public void add() {
 		playable = true;
 	}
-	
+
 }

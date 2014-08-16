@@ -169,7 +169,7 @@ public class Board {
 	}
 
 	public int getRefutePlayer(){
-		return refutePlayer;
+		return playerList.get(refutePlayer).getChar();
 	}
 
 	//Returns the player coords of the player ENUM
@@ -224,21 +224,27 @@ public class Board {
 		return NOTHING;
 	}
 
+	public boolean canSuggest(){
+		return playerList.get(currentPlayer).isSuggestable();
+	}
+
 	/*
 	 * Suggest mechanism, suggest an ENUM combination (3 numbers). Returns true if it's valid to suggest at the time
 	 * else returns false if invalid. CAN ONLY SUGGEST IN STATE 2 -AFTER- the movement.
 	 */
 	public boolean suggest(int suggestion){
-		if (currentState == 2){
+		if (currentState == 2 || (currentState == 0 && playerList.get(currentPlayer).isSuggestable())){
 			//Ensure that the suggestion is valid
 			if (findRoom(suggestion) >= 100 && findRoom(suggestion) <= 900 && findWeapon(suggestion) >= 10 && findWeapon(suggestion) <= 60 && findChar(suggestion) >= 1 && findChar(suggestion) <= 6){
+				playerList.get(currentPlayer).suggestable(false);
 				Player accused = getPlayer(findChar(suggestion));
+				accused.suggestable(true);
 				Room accusedRoom = getRoom(findRoom(suggestion));
 				accused.setCoords(roomCoords.get(convertRoom(suggestion)));
 				accused.setRoom(findRoom(suggestion));
 				this.currentSuggest = suggestion;
 				refutePlayer = (currentPlayer + 1)%numPlayers;
-				moveState();
+				currentState = 3;
 				return true;
 			}
 		}
