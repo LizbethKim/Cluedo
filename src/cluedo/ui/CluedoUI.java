@@ -150,10 +150,12 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 				// A move is to be made
 				int moveResult = game.move(c);
 				infoPane.displayMovesLeft(game.getMovesLeft());
-//				canvas.clearHighlight();
-//				canvas.highlight(game.getPossibleMoves());
+				canvas.clearHighlight();
+				canvas.highlight(game.getPossibleMoves());
 				canvas.repaint();
 				if (moveResult == Board.SUCCESS && game.getRoom() != Board.NOTHING) {
+					canvas.clearHighlight();
+					canvas.repaint();
 					this.doSuggestion();
 				} else if (game.getMovesLeft() == 0) {
 					infoPane.showTurnEnd();
@@ -188,6 +190,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 							|| (game.getRoom() == Board.LOUNGE && game.getRoom(c) == Board.CONSERVATORY))) {
 				// Trying to take a passage
 				if (game.takePassage()) {
+					canvas.repaint();
 					this.doSuggestion();
 					
 				}
@@ -199,9 +202,9 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			dicePane.setRolled(true);
 			infoPane.displayMovesLeft(newRoll);
 			game.rollDice(newRoll);
-//			canvas.clearHighlight();
-//			canvas.highlight(game.getPossibleMoves());
-//			canvas.repaint();
+			canvas.clearHighlight();
+			canvas.highlight(game.getPossibleMoves());
+			canvas.repaint();
 		}
 		
 
@@ -292,7 +295,6 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		if (game.refute(refution) == refution) {
 			JOptionPane.showMessageDialog(this, players.get(game.getRefutePlayer()) + " refutes with " + asString(refution));
 		}
-		System.out.println(game.getState());
 	}
 	
 	private void gameOver(int winner) {
@@ -369,6 +371,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		this.cardCanvas.restart();
 		this.list.restart();
 		this.currentPlayer = 1;
+		this.infoPane.clear();
 		players = new HashMap<Integer, String>();
 		repaint();
 		

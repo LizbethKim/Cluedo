@@ -93,11 +93,13 @@ public class BoardCanvas extends JPanel{
 		g.fillRect(0, 0, width, height);
 		g.drawImage(boardPic, 1, 0, width, height, this);
 
-		// TODO make path highlighting
+		// path highlighting
 		g.setColor(highlightCol);
 		for (Coordinate c: highlighted) {
-			g.fillRect(boardLeft + (int)(squareWidth*c.getX()) - 1, boardTop + (int)(squareWidth*c.getY()) - 1, (int)squareWidth + 2, (int)squareWidth + 2);
+			g.fillRect(boardLeft + (int)(squareWidth*c.getX()), boardTop + (int)(squareWidth*c.getY()), (int)squareWidth + 1, (int)squareWidth + 1);
 		}
+		
+		
 		List<Coordinate> used = new ArrayList<Coordinate>();
 		for (int chara : colors.keySet()) {
 			
