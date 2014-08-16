@@ -1,6 +1,5 @@
 package cluedo.ui;
 
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -18,7 +17,6 @@ import javax.swing.JPanel;
 /**
  * The panel of the UI that displays the dice roll
  * @author kelsey
- *
  */
 @SuppressWarnings("serial")
 public class DicePane extends JPanel {
@@ -47,13 +45,11 @@ public class DicePane extends JPanel {
 			dice.put(4, ImageIO.read(new File("assets/four.jpg")));
 			dice.put(5, ImageIO.read(new File("assets/five.jpg")));
 			dice.put(6, ImageIO.read(new File("assets/six.jpg")));
-		
 		} catch (IOException e) {
 			System.out.println(e);
 		}
 	}
 
-	
 	/**
 	 * Will roll the dice
 	 * @return the amount rolled
@@ -65,12 +61,18 @@ public class DicePane extends JPanel {
 		return d1 + d2;
 	}
 	
+	/**
+	 * Sets whether the dice have been rolled. If they have not
+	 * yet been rolled, "click to roll" is displayed.
+	 * @param rolled
+	 */
 	public void setRolled(boolean rolled) {
 		this.rolled = rolled;
 		repaint();
 	}
 	
 	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
 		g.clearRect(0, 0, width, height);
 		g.drawImage(dice.get(d1), dLeft, d1Top, dieSize, dieSize, this);
 		g.drawImage(dice.get(d2), dLeft, d2Top, dieSize, dieSize, this);
@@ -86,15 +88,9 @@ public class DicePane extends JPanel {
 		return new Dimension(width ,height);
 	}
 	
-//	public int getWidth() {
-//		return width;
-//	}
-//
-//	public int getHeight() {
-//		return height;
-//	}
-
-
+	/**
+	 * Resets for a new game
+	 */
 	public void restart() {
 		d1 = 6;
 		d2 = 6;

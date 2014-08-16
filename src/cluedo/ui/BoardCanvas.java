@@ -20,13 +20,17 @@ import javax.swing.JPanel;
 import cluedo.Coordinate;
 import cluedo.board.Board;
 
+
+/**
+ * JPanel to display the board.
+ * @author kelsey
+ */
 @SuppressWarnings("serial")
 public class BoardCanvas extends JPanel{
 
 	private Image boardPic;
 	private final int width;
 	private final int height;
-
 	private final int boardLeft;
 	private final int boardTop;
 	private final double squareWidth;
@@ -40,7 +44,9 @@ public class BoardCanvas extends JPanel{
 	List<Coordinate> shifts;
 	
 	/**
-	 * @param big Whether the boards should be large or not
+	 * 
+	 * @param big Whether the board should be large or not
+	 * @param game The game that is being displayed on the board
 	 */
 	public BoardCanvas (boolean big, Board game) {
 		this.game = game;
@@ -57,8 +63,8 @@ public class BoardCanvas extends JPanel{
 			boardTop = 11;
 			squareWidth = 25.38;
 		}
+		// set up the colours for each character token
 		colors = new HashMap<Integer, Color>();
-		
 		colors.put(Board.SCARLETT, Color.red);
 		colors.put(Board.MUSTARD, new Color (255,205,90));
 		colors.put(Board.WHITE, Color.white);
@@ -66,20 +72,21 @@ public class BoardCanvas extends JPanel{
 		colors.put(Board.PEACOCK, Color.blue.brighter());
 		colors.put(Board.PLUM, new Color(170, 70 ,255));
 		
+		// used to spread out tokens within a room
 		shifts = new ArrayList<Coordinate>();
 		shifts.add(new Coordinate(-1, 0));
-		shifts.add(new Coordinate(-2, 0));
-		shifts.add(new Coordinate(1, 0));
 		shifts.add(new Coordinate(0, -1));
-		shifts.add(new Coordinate(0, 1));
 		shifts.add(new Coordinate(-1, -1));
-		shifts.add(new Coordinate(-2, -1));
-		shifts.add(new Coordinate(1, -1));
+		shifts.add(new Coordinate(0, 1));
 		shifts.add(new Coordinate(-1, 1));
+		shifts.add(new Coordinate(1, 0));
+		shifts.add(new Coordinate(1, -1));
+		shifts.add(new Coordinate(1, 1));
+		shifts.add(new Coordinate(-2, 0));
+		shifts.add(new Coordinate(-2, -1));
 		shifts.add(new Coordinate(-2, 1));
-		shifts.add(new Coordinate(1, 1));		
-		
-		// TODO position weapons
+				
+		// TODO position weapons?
 		try {
 		    boardPic = ImageIO.read(new File("assets/board.jpg"));
 		} catch (IOException e) {
@@ -99,13 +106,13 @@ public class BoardCanvas extends JPanel{
 			g.fillRect(boardLeft + (int)(squareWidth*c.getX()), boardTop + (int)(squareWidth*c.getY()), (int)squareWidth + 1, (int)squareWidth + 1);
 		}
 		
-		
 		List<Coordinate> used = new ArrayList<Coordinate>();
 		for (int chara : colors.keySet()) {
-			
 			Coordinate c = game.getPlayerCoords(chara);
 			int room = game.getRoom(c);
 			if (room == Board.NOTHING || !used.contains(c)) {
+				// not overlapping another player, so 
+				// just draw the player exactly where they're stored
 				g.setColor(Color.black);
 				g.fillOval(boardLeft + (int)(squareWidth*c.getX()) + 2, boardTop + (int)(squareWidth*c.getY()) + 2, (int)squareWidth - 4, (int)squareWidth - 4);
 				g.setColor(colors.get(chara));
@@ -113,6 +120,7 @@ public class BoardCanvas extends JPanel{
 				used.add(c);
 			} else {
 				// this deals with spreading players out within rooms
+				// so that they're not covering another player
 				for (Coordinate shift: shifts) {
 					Coordinate shifted = Coordinate.addCoords(c, shift);
 					if (!used.contains(shifted) && game.getRoom(shifted) == room) {
@@ -131,31 +139,19 @@ public class BoardCanvas extends JPanel{
 		
 	}
 
-
 	/**
-	 * Allows squares on the board to be highlighted
-	 * @param c
+	 * Highlights the collection of coordinates green
+	 * @param cs Coordinates to be highlighted
 	 */
-	public void highlight(Coordinate c) {
-		highlighted.add(c);
-	}
-
-	public void unHighlight(Coordinate c) {
-		highlighted.remove(c);
-	}
-	
 	public void highlight(Collection<Coordinate> cs) {
 		for (Coordinate c: cs) {
 			highlighted.add(c);
 		}
 	}
 
-	public void unHighlight(Collection<Coordinate> cs) {
-		for (Coordinate c: cs) {
-			highlighted.remove(c);
-		}
-	}
-
+	/**
+	 * Clears highlighting
+	 */
 	public void clearHighlight() {
 		highlighted = new HashSet<Coordinate>();
 	}
@@ -176,11 +172,11 @@ public class BoardCanvas extends JPanel{
 	public double getSquareWidth() {
 		return squareWidth;
 	}
-
-	public int getBoardHeight() {
-		return height;
-	}
-
+	
+	/**
+	 * Resets the board to display the new game
+	 * @param game
+	 */
 	public void restart(Board game) {
 		this.game = game;
 		highlighted = new HashSet<Coordinate>();

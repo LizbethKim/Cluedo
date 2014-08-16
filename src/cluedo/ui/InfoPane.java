@@ -7,10 +7,14 @@ import java.awt.Graphics;
 
 import javax.swing.JPanel;
 
+/**
+ * Pane to display extra messages.
+ * @author kelsey
+ */
 @SuppressWarnings("serial")
 public class InfoPane extends JPanel {
-	private String message1;
-	private String message2;
+	private String message1 = "";
+	private String message2 = "";
 	private Color col;
 	private Font f;
 	private int x;
@@ -18,12 +22,6 @@ public class InfoPane extends JPanel {
 	
 	private int width = 200;
 	private int height = 190;
-	
-	
-	public InfoPane() {
-		message1 = "";
-		message2 = "";
-	}
 	
 	public void displayMovesLeft(int movesLeft) {
 		message1 = movesLeft + " moves left";
@@ -60,11 +58,8 @@ public class InfoPane extends JPanel {
 		g.drawString(message2, x, y + 20);
 	}
 
-	
 	@Override
 	public Dimension getPreferredSize() {
 		return new Dimension(width,height);
-	}
-
-	
+	}	
 }

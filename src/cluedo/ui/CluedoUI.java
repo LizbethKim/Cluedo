@@ -33,16 +33,13 @@ import cluedo.Coordinate;
 import cluedo.Main;
 import cluedo.board.Board;
 
-
 /**
  * The main window of the UI for the game. Also has control responsibilities.
- *
  * @author kelsey
- *
  */
 @SuppressWarnings("serial")
 public class CluedoUI extends JFrame implements MouseListener, ActionListener {
-
+	// swing components
 	private BoardCanvas canvas;
 	private DicePane dicePane;
 	private CardCanvas cardCanvas;
@@ -51,15 +48,16 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 
 	private final int boardCanvasTop = 45;
 	private final int bottomPaneTop;
-//	private final int cardCanvasLeft = 130;
-//	private final int checkPaneLeft;
-
+	
+	// game data
 	private Board game;
 	private int currentPlayer = 1;
-//	private Map<Integer, String> characters;
 	private Map<Integer, String> players;
 
-
+	/**
+	 * Creates and displays the GUI. 
+	 * @param game The game to display and start.
+	 */
 	public CluedoUI(Board game) {
 		super("Cluedo");
 		this.game = game;
@@ -67,30 +65,29 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 
 		// Set up the menus
 		JMenuBar menuBar = new JMenuBar();
+		
 		JMenu gameOptionMenu = new JMenu("Game");
-		// JMenu playerOptionMenu = new JMenu("Player"); TODO
+		JMenu fileOptionMenu = new JMenu("File");
+		
 		JMenuItem quit = new JMenuItem("Quit");
 		quit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				System.exit(NORMAL);
 			}
-
 		});
 		JMenuItem restart = new JMenuItem("Restart");
 		restart.setActionCommand("Restart");
 		restart.addActionListener(this);
-		gameOptionMenu.add(restart);
-		gameOptionMenu.add(quit);
-		JMenu fileOptionMenu = new JMenu("File");
 		JMenuItem rules = new JMenuItem("Rules");
 		rules.setActionCommand("Rules");
 		rules.addActionListener(this);
-
 		JMenuItem help = new JMenuItem("Help");
 		help.setActionCommand("Help");
 		help.addActionListener(this);
-
+		
+		gameOptionMenu.add(restart);
+		gameOptionMenu.add(quit);
 		fileOptionMenu.add(rules);
 		fileOptionMenu.add(help);
 		menuBar.add(fileOptionMenu);
@@ -125,9 +122,10 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		right.add(list, BorderLayout.CENTER);
 		right.add(infoPane, BorderLayout.SOUTH);
 
-		setLayout(new BorderLayout()); // use border layer
+		setLayout(new BorderLayout());
 		add(left, BorderLayout.WEST);
 		add(right, BorderLayout.EAST);
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		pack();
 		setResizable(false);
@@ -138,17 +136,16 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		this.restart(game);
 	}
 
-
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// Move to a square on canvas
+		// Click a square on the board
 		if (canvas.contains(e.getX(), e.getY() - boardCanvasTop)) {
 			int xCoord = (int) ((e.getX() - canvas.getBoardLeft()) / canvas.getSquareWidth());
 			int yCoord = (int) ((e.getY() - canvas.getBoardTop() - boardCanvasTop) / canvas.getSquareWidth());
-			Coordinate c = new Coordinate(xCoord, yCoord);
+			Coordinate clickedCoord = new Coordinate(xCoord, yCoord);
 			if (game.getState() == 1) {
 				// A move is to be made
-				int moveResult = game.move(c);
+				int moveResult = game.move(clickedCoord);
 				infoPane.displayMovesLeft(game.getMovesLeft());
 				canvas.clearHighlight();
 				canvas.highlight(game.getPossibleMoves());
@@ -160,16 +157,15 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 				} else if (game.getMovesLeft() == 0) {
 					infoPane.showTurnEnd();
 				}
-				
-			} else if (game.getState() == 0 && game.getRoom(c) == Board.MIDDLE) {
+			} else if (game.getState() == 0 && game.getRoom(clickedCoord) == Board.MIDDLE) {
 				// An accusation is to be made
-				int guess = new SuggestDialog(0).getGuess();
-				int result = game.accuse(guess);
-				if (result == Board.SUCCESS) {
+				int guess = new SuggestDialog(this, 0).getGuess();
+				int accResult = game.accuse(guess);
+				if (accResult == Board.SUCCESS) {
 					if (game.getState() == 5) {
 						gameOver(currentPlayer);
 					}
-				} else if (result == Board.FAIL) {
+				} else if (accResult == Board.FAIL) {
 					JOptionPane.showMessageDialog(this, "Incorrect guess, you lose!");
 					JOptionPane.showMessageDialog(this, players.get(currentPlayer) + " has lost and may no longer play except to refute.");
 					if (game.getState() == 5) {
@@ -180,14 +176,14 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 				} else {
 					System.out.println("guess should not have been made");
 				}
-			} else if (game.getState() == 0 && game.getRoom() == game.getRoom(c) && game.canSuggest()) {
+			} else if (game.getState() == 0 && game.getRoom() == game.getRoom(clickedCoord) && game.canSuggest()) {
 				// They have just been teleported into a room and wish to make a suggestion
 				this.doSuggestion();
 			} else if (game.getState() == 0 && 
-					((game.getRoom() == Board.KITCHEN && game.getRoom(c) == Board.STUDY)
-							|| (game.getRoom() == Board.STUDY && game.getRoom(c) == Board.KITCHEN)
-							|| (game.getRoom() == Board.CONSERVATORY && game.getRoom(c) == Board.LOUNGE)
-							|| (game.getRoom() == Board.LOUNGE && game.getRoom(c) == Board.CONSERVATORY))) {
+					((game.getRoom() == Board.KITCHEN && game.getRoom(clickedCoord) == Board.STUDY)
+							|| (game.getRoom() == Board.STUDY && game.getRoom(clickedCoord) == Board.KITCHEN)
+							|| (game.getRoom() == Board.CONSERVATORY && game.getRoom(clickedCoord) == Board.LOUNGE)
+							|| (game.getRoom() == Board.LOUNGE && game.getRoom(clickedCoord) == Board.CONSERVATORY))) {
 				// Trying to take a passage
 				if (game.takePassage()) {
 					canvas.repaint();
@@ -206,15 +202,14 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			canvas.highlight(game.getPossibleMoves());
 			canvas.repaint();
 		}
-		
-
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("End Turn")) {
-			if ((game.getState() == 2 && game.getMovesLeft() == 0) || game.getState() == 3)
-			this.endTurn();
+			if ((game.getState() == 2 && game.getMovesLeft() == 0) || game.getState() == 3) {
+				this.endTurn();
+			}
 		} else if (e.getActionCommand().equals("Rules")) {
 			this.showRules();
 		} else if (e.getActionCommand().equals("Help")) {
@@ -241,7 +236,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 	}
 	
 	private void doSuggestion() {
-		int guess = new SuggestDialog(game.getRoom()).getGuess();
+		int guess = new SuggestDialog(this, game.getRoom()).getGuess();
 		if (game.suggest(guess)) {
 			canvas.repaint();
 			list.setPlayer(0);
@@ -359,9 +354,8 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		}
 	}
 	
-	/**
+	/*
 	 * Starts the game passed in, shows initial setup dialog.
-	 * @param game
 	 */
 	private void restart(Board game) {
 		
@@ -389,6 +383,40 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		r.start();
 	}
 
+	private class SuccessThread extends Thread {
+        private Board game;
+		private SelectPlayerDialog s;
+		private JComboBox<Integer> comboBox;
+		
+        SuccessThread(Board game, JComboBox<Integer> comboBox) {
+            this.game = game;
+            this.comboBox = comboBox;
+        }
+
+		@Override
+		public void run() {
+			s = new SelectPlayerDialog(CluedoUI.this, players, (int)comboBox.getSelectedItem());
+			while (!s.done()) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			s.dispose();
+			
+			for (Integer p: players.keySet()) {
+				game.addPlayer(p);
+			}
+			game.startGame();
+
+			currentPlayer = game.currentPlayer();
+			JOptionPane.showMessageDialog(CluedoUI.this, "It's " + players.get(currentPlayer) + "'s turn as " + CluedoUI.asString(currentPlayer) +"!");
+			list.setPlayer(currentPlayer);
+			cardCanvas.updateCards(game.getPlayerCards());
+		}
+    }
+	
 	/**
 	 * Turns the integer values used within the program into the string that
 	 * is its name.
@@ -453,55 +481,12 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		}
 	}
 
-	private class SuccessThread extends Thread {
-        private Board game;
-		private SelectPlayerDialog s;
-		private JComboBox<Integer> comboBox;
-		
-        SuccessThread(Board game, JComboBox<Integer> comboBox) {
-            this.game = game;
-            this.comboBox = comboBox;
-        }
-
-		@Override
-		public void run() {
-			s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
-			while (!s.done()) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			s.dispose();
-			
-			for (Integer p: players.keySet()) {
-				game.addPlayer(p);
-			}
-			game.startGame();
-
-			currentPlayer = game.currentPlayer();
-			JOptionPane.showMessageDialog(CluedoUI.this, "It's " + players.get(currentPlayer) + "'s turn as " + CluedoUI.asString(currentPlayer) +"!");
-			list.setPlayer(currentPlayer);
-			cardCanvas.updateCards(game.getPlayerCards());
-		}
-    }
-
 	@Override
-	public void mousePressed(MouseEvent e) {
-	}
-
+	public void mousePressed(MouseEvent e) {}
 	@Override
-	public void mouseReleased(MouseEvent e) {
-	}
-
+	public void mouseReleased(MouseEvent e) {}
 	@Override
-	public void mouseEntered(MouseEvent e) {
-	}
-
+	public void mouseEntered(MouseEvent e) {}
 	@Override
-	public void mouseExited(MouseEvent e) {
-	}
-    
-
+	public void mouseExited(MouseEvent e) {}
 }

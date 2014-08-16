@@ -22,15 +22,14 @@ import cluedo.board.Board;
  */
 @SuppressWarnings("serial")
 public class CardCanvas extends JPanel {
-	private List<Integer> cardsToDisplay;
 	private Map<Integer, Image> cards; 
-	
 	private final int  height = 190;
 	private final int width = 500;
 	private final int space = 2;
 	private final int cardTop = 25;
 	private final int cardWidth = 80;
 	private final int cardHeight = 118;
+	private List<Integer> cardsToDisplay;
 
 	public CardCanvas() {
 		cardsToDisplay = new ArrayList<Integer>();
@@ -57,27 +56,26 @@ public class CardCanvas extends JPanel {
 			cards.put(Board.BILLARD, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.BILLARD) + ".jpg")));
 			cards.put(Board.LIBRARY, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.LIBRARY) + ".jpg")));
 			cards.put(Board.HALL, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.HALL) + ".jpg")));
-
 		} catch (IOException e) {
 			System.out.println(e);
 		}
-
 	}
 	
+	
 	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
 		g.clearRect(0, 0, width, height);
 		int left = (width + space - cardsToDisplay.size()*(cardWidth + space))/2;
 		for (int card: cardsToDisplay) {
 			g.drawImage(cards.get(card), left, cardTop, cardWidth, cardHeight, this);
-			//g.drawImage(cards.get(s), left, cardTop, this);
 			left += cardWidth + space;
 		}
-
 	}
 	
 	/**
 	 * To update which cards are shown in the card panel.
-	 * @param cards A list of the card names
+	 * @param cards A list of the card numbers. Mustn't be 
+	 * null or have more than 6 elements.
 	 */
 	public void updateCards (List<Integer> cards) {
 		if (cards == null || cards.size() > 6) {
@@ -85,7 +83,6 @@ public class CardCanvas extends JPanel {
 		}
 		this.cardsToDisplay = cards;
 		repaint();
-		
 	}
 	
 	@Override

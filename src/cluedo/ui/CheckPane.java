@@ -17,7 +17,13 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
-
+/**
+ * A panel to display an editable check-list for players to record what cards 
+ * they have eliminated. Each player has their own check-list that gets displayed
+ * if you use setPlayer()
+ * @author kelsey
+ *
+ */
 @SuppressWarnings("serial")
 public class CheckPane extends JPanel {
 	
@@ -25,10 +31,8 @@ public class CheckPane extends JPanel {
 	private Map<Integer, JList<CheckableItem>> lists;	// each player's list
 	private int currentPlayer = 1;
 	
-	
 	@SuppressWarnings("unchecked")
 	public CheckPane() {
-		
 		// create and populate the map for players' lists
 		lists = new HashMap<Integer, JList<CheckableItem>>();
 		for (int i = 1; i < 7; i++) {
@@ -68,8 +72,6 @@ public class CheckPane extends JPanel {
 		repaint();
 	}
    
-
-    
     private CheckableItem[] createData(String[] strs) {
         int n = strs.length;
         CheckableItem[] items = new CheckableItem[n];
@@ -81,7 +83,6 @@ public class CheckPane extends JPanel {
 
     private class CheckableItem {
         private String str;
-
         private boolean isSelected;
 
         public CheckableItem(String str) {
@@ -101,19 +102,12 @@ public class CheckPane extends JPanel {
           return str;
         }
     }
-    
-    @Override
-	public Dimension getPreferredSize() {
-		return new Dimension(200,586);
-	}
-    
-    
+        
 	@SuppressWarnings("rawtypes")
 	private class CheckListRenderer extends JCheckBox implements ListCellRenderer {
 
         public CheckListRenderer() {
           setBackground(UIManager.getColor("List.textBackground"));
- 
           setForeground(UIManager.getColor("List.textForeground"));
         }
 
@@ -125,8 +119,17 @@ public class CheckPane extends JPanel {
           setText(value.toString());
           return this;
         }
-      }
+    }
 
+    @Override
+	public Dimension getPreferredSize() {
+		return new Dimension(200,586);
+	}
+	
+    /**
+     * Clears and re-populates the lists belonging to each player.
+     */
+	@SuppressWarnings("unchecked")
 	public void restart() {
 		remove(lists.get(currentPlayer));
 		lists = new HashMap<Integer, JList<CheckableItem>>();
@@ -150,5 +153,4 @@ public class CheckPane extends JPanel {
 		this.currentPlayer = 1;
 		repaint();
 	}
-    
 }
