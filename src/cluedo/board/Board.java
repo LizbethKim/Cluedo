@@ -314,7 +314,7 @@ public class Board {
 	}
 
 	public Set<Coordinate> getPossibleMoves(){
-		System.out.println(currentMove);
+		//System.out.println(currentMove);
 		boolean[][] aSt = aStarBoard;
 		return recurseMoves(playerList.get(currentPlayer).getCoords(), 0, aSt);
 	}

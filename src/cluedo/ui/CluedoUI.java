@@ -150,12 +150,15 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 				// A move is to be made
 				int moveResult = game.move(c);
 				infoPane.displayMovesLeft(game.getMovesLeft());
+				canvas.clearHighlight();
+				canvas.highlight(game.getPossibleMoves());
 				canvas.repaint();
 				if (moveResult == Board.SUCCESS && game.getRoom() != Board.NOTHING) {
 					this.doSuggestion();
 				} else if (game.getMovesLeft() == 0) {
 					infoPane.showTurnEnd();
 				}
+				
 			} else if (game.getState() == 0 && game.getRoom(c) == Board.MIDDLE) {
 				// An accusation is to be made
 				int guess = new SuggestDialog(0).getGuess();
@@ -196,13 +199,12 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			dicePane.setRolled(true);
 			infoPane.displayMovesLeft(newRoll);
 			game.rollDice(newRoll);
-		}
-		
-		if (game.getState() == 1) {
 			canvas.clearHighlight();
 			canvas.highlight(game.getPossibleMoves());
 			canvas.repaint();
 		}
+		
+
 	}
 
 	@Override
