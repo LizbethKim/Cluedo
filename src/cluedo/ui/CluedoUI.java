@@ -169,8 +169,9 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 					JOptionPane.showMessageDialog(this, players.get(currentPlayer) + " has lost and may no longer play except to refute.");
 					if (game.getState() == 5) {
 						gameOver(0);
+					} else {
+						this.endTurn();
 					}
-					this.endTurn();
 				} else {
 					System.out.println("guess should not have been made");
 				}
