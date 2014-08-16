@@ -147,10 +147,10 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			int yCoord = (int) ((e.getY() - canvas.getBoardTop() - boardCanvasTop) / canvas.getSquareWidth());
 			Coordinate c = new Coordinate(xCoord, yCoord);
 			if (game.getState() == 1) {
-				game.move(c);
+				int moveResult = game.move(c);
 				infoPane.displayMovesLeft(game.getMovesLeft());
 				canvas.repaint();
-				if (game.getRoom() != Board.NOTHING) {
+				if (moveResult == Board.SUCCESS && game.getRoom() != Board.NOTHING) {
 					int guess = new SuggestDialog(game.getRoom()).getGuess();
 					if (game.suggest(guess)) {
 						canvas.repaint();
@@ -161,10 +161,22 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 				int guess = new SuggestDialog(0).getGuess();
 				int result = game.accuse(guess);
 				if (result == Board.SUCCESS) {
-					// TODO end the game with a win
+					if (game.getState() == 5) {
+						JOptionPane.showMessageDialog(this, "Game over, " + players.get(currentPlayer) + " won!");
+						int playAgain = JOptionPane.showConfirmDialog(this, "Play again?", "", JOptionPane.YES_NO_OPTION);
+						if (playAgain == JOptionPane.YES_OPTION) {
+							try {
+								this.restart(Main.createBoardFromFile("board.txt"));
+							} catch (IOException err) {
+								System.out.println(e);
+							}
+						} else {
+							System.exit(0);
+						}
+					}
 				} else if (result == Board.FAIL) {
 					JOptionPane.showMessageDialog(this, "Incorrect guess, you lose!");
-					JOptionPane.showMessageDialog(this, players.get(game.currentPlayer()) + " has lost and may no longer play except to refute.");
+					JOptionPane.showMessageDialog(this, players.get(currentPlayer) + " has lost and may no longer play except to refute.");
 					if (game.getState() == 5) {
 						JOptionPane.showMessageDialog(this, "Game over!");
 						int playAgain = JOptionPane.showConfirmDialog(this, "Play again?", "", JOptionPane.YES_NO_OPTION);
@@ -178,14 +190,18 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 							System.exit(0);
 						}
 					}
-					// TODO display losing message
 				} else {
-					// TODO maybe display message?
+					System.out.println("guess should not have been made");
 				}
-
-			} //else if (game.getState() == 0 && something something corner room) {
-				//secret passage
-			//}
+			
+			} else if (game.getState() == 0 && 
+					((game.getRoom() == Board.KITCHEN && game.getRoom(c) == Board.STUDY)
+							|| (game.getRoom() == Board.STUDY && game.getRoom(c) == Board.KITCHEN)
+							|| (game.getRoom() == Board.CONSERVATORY && game.getRoom(c) == Board.LOUNGE)
+							|| (game.getRoom() == Board.LOUNGE && game.getRoom(c) == Board.CONSERVATORY))) {
+				game.takePassage();
+				canvas.repaint();
+			}
 		// Dice roll
 		} else if (dicePane.contains(e.getX(), e.getY() - bottomPaneTop) && game.getState() == 0) {
 			int newRoll = dicePane.rollDice();
@@ -193,8 +209,8 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			infoPane.displayMovesLeft(newRoll);
 			game.rollDice(newRoll);
 		}
-
-
+		
+		
 
 	}
 
@@ -259,13 +275,13 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		}
 
 	}
-
+	
 	/**
 	 * Starts the game passed in, shows initial setup dialog.
 	 * @param game
 	 */
 	private void restart(Board game) {
-
+		
 		this.game = game;
 		this.canvas.restart(game);
 		this.dicePane.restart();
@@ -274,14 +290,14 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		this.currentPlayer = 1;
 		players = new HashMap<Integer, String>();
 		repaint();
-
+		
 		JOptionPane.showMessageDialog(this, "See 'help'and 'rules' in the game menu to learn how to play.", "Welcome to Cluedo!", JOptionPane.PLAIN_MESSAGE);
-
+		
 		JPanel panel = new JPanel();
 		panel.add(new JLabel("How many players?"));
 		final JComboBox<Integer> comboBox = new JComboBox<Integer>(new Integer[]{3, 4, 5, 6});
 		panel.add(comboBox);
-
+		
 		JOptionPane.showMessageDialog(this, panel, "Welcome to Cluedo!", JOptionPane.PLAIN_MESSAGE);
 
 
@@ -292,40 +308,30 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		 * menu -> restart, it doesn't work. That's when it's called from
 		 * actionPerformed (one method up from here).
 		 */
-		Worker x = new Worker(comboBox);
-		x.execute();
-		while (!(x.isItDone())){
-			try {
-				x.doInBackground();
-			} catch (Exception e) {
-				e.printStackTrace();
+		Thread r = new Thread () {
+			private SelectPlayerDialog s;			
+			@Override
+			public void run() {
+				s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
+				while (!s.done()) {
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				s.dispose();
 			}
+		};
+		
+		r.start();
+		
+		try {
+			r.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-		x.done();
-//		Thread r = new Thread () {
-//			private SelectPlayerDialog s;
-//			@Override
-//			public void run() {
-//				s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
-//				while (!s.done()) {
-//					try {
-//						Thread.sleep(100);
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//				}
-//				s.dispose();
-//			}
-//		};
-//
-//		r.start();
-//
-//		try {
-//			r.join();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-
+		
 		// FIXME doesn't actually show second time round.
 //		SelectPlayerDialog s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
 //		while(!s.done()) {
@@ -337,7 +343,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 //			}
 //		}
 //		s.dispose();
-
+		
 		for (Integer p: players.keySet()) {
 			game.addPlayer(p);
 		}
@@ -430,36 +436,5 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 	@Override
 	public void mouseExited(MouseEvent e) {
 	}
-
-	private class Worker extends SwingWorker<Void, Void> {
-		SelectPlayerDialog s;
-
-        public Worker(JComboBox<Integer> comboBox) {
-            s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
-        }
-
-        @Override
-        protected Void doInBackground() throws Exception {
-            Thread.sleep(2000);
-            return null;
-        }
-
-        @Override
-        protected void done() {
-            if (s.done()){
-            	s.dispose();
-            }
-
-            try {
-                get();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        public boolean isItDone(){
-        	return s.done();
-        }
-    }
 
 }
