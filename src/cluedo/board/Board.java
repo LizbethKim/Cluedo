@@ -2,9 +2,11 @@ package cluedo.board;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
 
 import cluedo.AStar;
 import cluedo.Coordinate;
@@ -309,6 +311,37 @@ public class Board {
 		} else {
 			return NOTHING;
 		}
+	}
+
+	public Set<Coordinate> getPossibleMoves(){
+		Set<Coordinate> possible = new HashSet<Coordinate>();
+		System.out.println(currentMove);
+		boolean[][] aSt = aStarBoard;
+		possible = recurseMoves(possible, playerList.get(currentPlayer).getCoords(), 0, aSt);
+		return possible;
+	}
+
+	private Set<Coordinate> recurseMoves(Set<Coordinate> current, Coordinate coords, int depth, boolean[][] aStar){
+		current.add(coords);
+		if (depth == currentMove) return current;
+		aStar[coords.getX()][coords.getY()] = false;
+		if (coords.getX() + 1 < board.length && aStar[coords.getX()+1][coords.getY()]){
+			Set<Coordinate> temp = recurseMoves(current, new Coordinate(coords.getX()+1, coords.getY()), depth+1, aStar);
+			current.addAll(temp);
+		}
+		if (coords.getX() - 1 >= 0 && aStar[coords.getX()-1][coords.getY()]){
+			Set<Coordinate> temp = recurseMoves(current, new Coordinate(coords.getX()-1, coords.getY()), depth+1, aStar);
+			current.addAll(temp);
+		}
+		if (coords.getY() + 1 < board[0].length && aStar[coords.getX()][coords.getY()+1]){
+			Set<Coordinate> temp = recurseMoves(current, new Coordinate(coords.getX(), coords.getY() + 1), depth+1, aStar);
+			current.addAll(temp);
+		}
+		if (coords.getY() - 1 >= 0 && aStar[coords.getX()+1][coords.getY()-1]){
+			Set<Coordinate> temp = recurseMoves(current, new Coordinate(coords.getX(), coords.getY() - 1), depth+1, aStar);
+			current.addAll(temp);
+		}
+		return current;
 	}
 
 

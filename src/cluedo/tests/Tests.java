@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -139,6 +140,16 @@ public class Tests {
 		board.nextTurn();
 		board.rollDice(100);
 		assertTrue(board.move(rooms.get(6)) == board.FAIL);
+	}
+	
+	@Test
+	public void breadthFirstSearch(){
+		Board board = makeBoard();
+		board.addPlayer(1);
+		board.startGame();
+		board.rollDice(4);
+		Set<Coordinate> meow = board.getPossibleMoves();
+		assertTrue(meow.size() == 8);
 	}
 
 
