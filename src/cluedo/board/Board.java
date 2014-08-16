@@ -326,6 +326,7 @@ public class Board {
 						aSt[i][j] = aStarBoard[i][j];
 					}
 				}
+				aSt[c.getX()][c.getY()] = false;
 				roomHighlight.addAll(recurseMoves(c, 0, aSt, roomsVisited));
 			}
 			return roomHighlight;
