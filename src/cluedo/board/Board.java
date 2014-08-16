@@ -169,7 +169,7 @@ public class Board {
 	}
 
 	public int getRefutePlayer(){
-		return refutePlayer;
+		return playerList.get(refutePlayer).getChar();
 	}
 
 	//Returns the player coords of the player ENUM
