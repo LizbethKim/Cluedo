@@ -252,6 +252,10 @@ public class Board {
 					return SUCCESS;
 				}
 				playerList.get(currentPlayer).remove();
+				for (Player p:playerList){
+					if (p.playable()) return FAIL;
+				}
+				currentState = 5;
 				return FAIL;
 			}
 			return NOTHING;
