@@ -27,6 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingWorker;
 
 import cluedo.Coordinate;
 import cluedo.Main;
@@ -181,7 +182,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 				} else {
 					// TODO maybe display message?
 				}
-			
+
 			} //else if (game.getState() == 0 && something something corner room) {
 				//secret passage
 			//}
@@ -192,8 +193,8 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			infoPane.displayMovesLeft(newRoll);
 			game.rollDice(newRoll);
 		}
-		
-		
+
+
 
 	}
 
@@ -258,13 +259,13 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		}
 
 	}
-	
+
 	/**
 	 * Starts the game passed in, shows initial setup dialog.
 	 * @param game
 	 */
 	private void restart(Board game) {
-		
+
 		this.game = game;
 		this.canvas.restart(game);
 		this.dicePane.restart();
@@ -273,48 +274,58 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		this.currentPlayer = 1;
 		players = new HashMap<Integer, String>();
 		repaint();
-		
+
 		JOptionPane.showMessageDialog(this, "See 'help'and 'rules' in the game menu to learn how to play.", "Welcome to Cluedo!", JOptionPane.PLAIN_MESSAGE);
-		
+
 		JPanel panel = new JPanel();
 		panel.add(new JLabel("How many players?"));
 		final JComboBox<Integer> comboBox = new JComboBox<Integer>(new Integer[]{3, 4, 5, 6});
 		panel.add(comboBox);
-		
+
 		JOptionPane.showMessageDialog(this, panel, "Welcome to Cluedo!", JOptionPane.PLAIN_MESSAGE);
 
-		
+
 		/*
 		 * LIZ LOOK HERE.
 		 * this is where there's the issue. I've tried fixing it by making a new
-		 * thread here, and it works fine the first time, but if you then go 
+		 * thread here, and it works fine the first time, but if you then go
 		 * menu -> restart, it doesn't work. That's when it's called from
 		 * actionPerformed (one method up from here).
 		 */
-		Thread r = new Thread () {
-			private SelectPlayerDialog s;			
-			@Override
-			public void run() {
-				s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
-				while (!s.done()) {
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-				s.dispose();
+		Worker x = new Worker(comboBox);
+		x.execute();
+		while (!(x.isItDone())){
+			try {
+				x.doInBackground();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		};
-		
-		r.start();
-		
-		try {
-			r.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
-		
+		x.done();
+//		Thread r = new Thread () {
+//			private SelectPlayerDialog s;
+//			@Override
+//			public void run() {
+//				s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
+//				while (!s.done()) {
+//					try {
+//						Thread.sleep(100);
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//				s.dispose();
+//			}
+//		};
+//
+//		r.start();
+//
+//		try {
+//			r.join();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+
 		// FIXME doesn't actually show second time round.
 //		SelectPlayerDialog s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
 //		while(!s.done()) {
@@ -326,20 +337,20 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 //			}
 //		}
 //		s.dispose();
-		
+
 		for (Integer p: players.keySet()) {
 			game.addPlayer(p);
 		}
 		game.startGame();
-		
+
 		currentPlayer = game.currentPlayer();
 		JOptionPane.showMessageDialog(CluedoUI.this, "It's " + players.get(currentPlayer) + "'s turn as " + CluedoUI.asString(currentPlayer) +"!");
 		list.setPlayer(currentPlayer);
-		cardCanvas.updateCards(game.getPlayerCards());	
+		cardCanvas.updateCards(game.getPlayerCards());
 	}
-	
+
 	/**
-	 * Turns the integer values used within the program into the string that 
+	 * Turns the integer values used within the program into the string that
 	 * is its name.
 	 * @param gamePart the integer related to the component
 	 */
@@ -369,9 +380,9 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			default: return null;
 		}
 	}
-	
+
 	/**
-	 * Turns the integer values used within the program into the string that 
+	 * Turns the integer values used within the program into the string that
 	 * is its name.
 	 * @param gamePart the string related to the component
 	 */
@@ -401,9 +412,9 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			default: return 0;
 		}
 	}
-	
-	
-	
+
+
+
 	@Override
 	public void mousePressed(MouseEvent e) {
 	}
@@ -419,5 +430,36 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 	@Override
 	public void mouseExited(MouseEvent e) {
 	}
+
+	private class Worker extends SwingWorker<Void, Void> {
+		SelectPlayerDialog s;
+
+        public Worker(JComboBox<Integer> comboBox) {
+            s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
+        }
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            Thread.sleep(2000);
+            return null;
+        }
+
+        @Override
+        protected void done() {
+            if (s.done()){
+            	s.dispose();
+            }
+
+            try {
+                get();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        public boolean isItDone(){
+        	return s.done();
+        }
+    }
 
 }
