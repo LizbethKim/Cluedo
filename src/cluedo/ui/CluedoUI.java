@@ -308,29 +308,15 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		 * menu -> restart, it doesn't work. That's when it's called from
 		 * actionPerformed (one method up from here).
 		 */
-		Thread r = new Thread () {
-			private SelectPlayerDialog s;			
-			@Override
-			public void run() {
-				s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
-				while (!s.done()) {
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-				s.dispose();
-			}
-		};
+		SuccessThread r = new SuccessThread (game, comboBox);
 		
 		r.start();
 		
-		try {
-			r.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			r.join();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
 		
 		// FIXME doesn't actually show second time round.
 //		SelectPlayerDialog s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
@@ -344,15 +330,6 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 //		}
 //		s.dispose();
 		
-		for (Integer p: players.keySet()) {
-			game.addPlayer(p);
-		}
-		game.startGame();
-
-		currentPlayer = game.currentPlayer();
-		JOptionPane.showMessageDialog(CluedoUI.this, "It's " + players.get(currentPlayer) + "'s turn as " + CluedoUI.asString(currentPlayer) +"!");
-		list.setPlayer(currentPlayer);
-		cardCanvas.updateCards(game.getPlayerCards());
 	}
 
 	/**
@@ -436,5 +413,38 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 	@Override
 	public void mouseExited(MouseEvent e) {
 	}
+    private class SuccessThread extends Thread {
+        private Board game;
+		private SelectPlayerDialog s;
+		private JComboBox comboBox;
+		
+        SuccessThread(Board game, JComboBox comboBox) {
+            this.game = game;
+            this.comboBox = comboBox;
+        }
+
+		@Override
+		public void run() {
+			s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
+			while (!s.done()) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			s.dispose();
+			
+			for (Integer p: players.keySet()) {
+				game.addPlayer(p);
+			}
+			game.startGame();
+
+			currentPlayer = game.currentPlayer();
+			JOptionPane.showMessageDialog(CluedoUI.this, "It's " + players.get(currentPlayer) + "'s turn as " + CluedoUI.asString(currentPlayer) +"!");
+			list.setPlayer(currentPlayer);
+			cardCanvas.updateCards(game.getPlayerCards());
+		}
+    }
 
 }
