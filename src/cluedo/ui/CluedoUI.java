@@ -175,7 +175,9 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 				} else {
 					System.out.println("guess should not have been made");
 				}
-			
+			} else if (game.getState() == 0 && game.getRoom() == game.getRoom(c) && game.canSuggest()) {
+				// They have just been teleported into a room and wish to make a suggestion
+				this.doSuggestion();
 			} else if (game.getState() == 0 && 
 					((game.getRoom() == Board.KITCHEN && game.getRoom(c) == Board.STUDY)
 							|| (game.getRoom() == Board.STUDY && game.getRoom(c) == Board.KITCHEN)
@@ -229,44 +231,55 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 	private void doSuggestion() {
 		int guess = new SuggestDialog(game.getRoom()).getGuess();
 		if (game.suggest(guess)) {
-			String[] cards;
-			int count;
 			canvas.repaint();
-			do {
-				List<Integer> cardsToRefuteFrom = game.getPlayerCards(game.getRefutePlayer());
-				cards = new String[3];
-				count = 0;
-				for(int card: cardsToRefuteFrom) {
-					if (card == game.findChar(guess) || card == game.findRoom(guess) || card == game.findWeapon(guess)) {
-						cards[count] = asString(card);
-						count++;
-					}
-				}
-				if (cards[0] == null) {
-					JOptionPane.showMessageDialog(this, players.get(game.getRefutePlayer()) + " couldn't refute the suggestion!");
-					if (game.refute(0) == Board.SUCCESS) {
-						JOptionPane.showMessageDialog(this, "<html><p>No one could refute" + players.get(currentPlayer) + "'s suggestion of<br>[" + asString(game.findChar(guess)) + " with the " + asString(game.findWeapon(guess)).toLowerCase() + " in the " + asString(game.findRoom(guess)).toLowerCase() +"]</p></html>");
-						return;
-					}
-				}
-			} while (cards[0] == null);
-			
-			String[] menuCards = new String[count];
-			for (int i = 0; i < count; i++) {
-				menuCards[i] = cards[i];
-			}
+			list.setPlayer(0);
+			cardCanvas.updateCards(new ArrayList<Integer>());
+			this.refute(guess);
+			list.setPlayer(currentPlayer);
+			cardCanvas.updateCards(game.getPlayerCards());
+		}
+	}
 	
-			JComboBox<String> comboBox = new JComboBox<String> (menuCards);
-			JPanel panel = new JPanel();
-			panel.setLayout(new BorderLayout());
-			panel.add(new JLabel("<html>Refute " + players.get(currentPlayer) + "'s suggestion of<br>[" + asString(game.findChar(guess)) + " with the " + asString(game.findWeapon(guess)).toLowerCase() + " in the " + asString(game.findRoom(guess)).toLowerCase() +"]<br>with which card?</html>"), BorderLayout.NORTH);
-			panel.add(Box.createRigidArea(new Dimension(0,12)), BorderLayout.CENTER);
-			panel.add(comboBox, BorderLayout.SOUTH);
-			JOptionPane.showOptionDialog(this, panel, players.get(game.getRefutePlayer()) + "'s turn to refute",  JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"Refute"}, null);		
-			int refution = asInt(comboBox.getSelectedItem().toString());
-			if (game.refute(refution) == refution) {
-				JOptionPane.showMessageDialog(this, players.get(game.getRefutePlayer()) + " refutes with " + asString(refution));
+	private void refute(int guess) {
+		if (game.getState() != 3) {
+			return;
+		}
+		String[] cards;
+		int count;
+		do {
+			List<Integer> cardsToRefuteFrom = game.getPlayerCards(game.getRefutePlayer());
+			cards = new String[3];
+			count = 0;
+			for(int card: cardsToRefuteFrom) {
+				if (card == game.findChar(guess) || card == game.findRoom(guess) || card == game.findWeapon(guess)) {
+					cards[count] = asString(card);
+					count++;
+				}
 			}
+			if (cards[0] == null) {
+				JOptionPane.showMessageDialog(this, players.get(game.getRefutePlayer()) + " couldn't refute the suggestion!");
+				if (game.refute(0) == Board.SUCCESS) {
+					JOptionPane.showMessageDialog(this, "<html><p>No one could refute" + players.get(currentPlayer) + "'s suggestion of<br>[" + asString(game.findChar(guess)) + " with the " + asString(game.findWeapon(guess)).toLowerCase() + " in the " + asString(game.findRoom(guess)).toLowerCase() +"]</p></html>");
+					return;
+				}
+			}
+		} while (cards[0] == null);
+		
+		String[] menuCards = new String[count];
+		for (int i = 0; i < count; i++) {
+			menuCards[i] = cards[i];
+		}
+
+		JComboBox<String> comboBox = new JComboBox<String> (menuCards);
+		JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+		panel.add(new JLabel("<html>Refute " + players.get(currentPlayer) + "'s suggestion of<br>[" + asString(game.findChar(guess)) + " with the " + asString(game.findWeapon(guess)).toLowerCase() + " in the " + asString(game.findRoom(guess)).toLowerCase() +"]<br>with which card?</html>"), BorderLayout.NORTH);
+		panel.add(Box.createRigidArea(new Dimension(0,12)), BorderLayout.CENTER);
+		panel.add(comboBox, BorderLayout.SOUTH);
+		JOptionPane.showOptionDialog(this, panel, players.get(game.getRefutePlayer()) + "'s turn to refute",  JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"Refute"}, null);		
+		int refution = asInt(comboBox.getSelectedItem().toString());
+		if (game.refute(refution) == refution) {
+			JOptionPane.showMessageDialog(this, players.get(game.getRefutePlayer()) + " refutes with " + asString(refution));
 		}
 	}
 	
