@@ -197,6 +197,12 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			infoPane.displayMovesLeft(newRoll);
 			game.rollDice(newRoll);
 		}
+		
+		if (game.getState() == 1) {
+			canvas.clearHighlight();
+			canvas.highlight(game.getPossibleMoves());
+			canvas.repaint();
+		}
 	}
 
 	@Override

@@ -7,9 +7,12 @@ import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
@@ -30,7 +33,7 @@ public class BoardCanvas extends JPanel{
 
 	private Color highlightCol = new Color(0, 255, 0, 100);
 
-	private List<Coordinate> highlighted = new ArrayList<Coordinate>();
+	private Set<Coordinate> highlighted = new HashSet<Coordinate>();
 	private Map<Integer, Color> colors;
 
 	private Board game;
@@ -54,7 +57,6 @@ public class BoardCanvas extends JPanel{
 			boardTop = 11;
 			squareWidth = 25.38;
 		}
-
 		colors = new HashMap<Integer, Color>();
 		
 		colors.put(Board.SCARLETT, Color.red);
@@ -92,10 +94,10 @@ public class BoardCanvas extends JPanel{
 		g.drawImage(boardPic, 1, 0, width, height, this);
 
 		// TODO make path highlighting
-//		g.setColor(highlightCol);
-//		for (Coordinate c: highlighted) {
-//			g.fillRect(boardLeft + (int)(squareWidth*c.getX()) - 1, boardTop + (int)(squareWidth*c.getY()) - 1, (int)squareWidth + 2, (int)squareWidth + 2);
-//		}
+		g.setColor(highlightCol);
+		for (Coordinate c: highlighted) {
+			g.fillRect(boardLeft + (int)(squareWidth*c.getX()) - 1, boardTop + (int)(squareWidth*c.getY()) - 1, (int)squareWidth + 2, (int)squareWidth + 2);
+		}
 		List<Coordinate> used = new ArrayList<Coordinate>();
 		for (int chara : colors.keySet()) {
 			
@@ -139,9 +141,21 @@ public class BoardCanvas extends JPanel{
 	public void unHighlight(Coordinate c) {
 		highlighted.remove(c);
 	}
+	
+	public void highlight(Collection<Coordinate> cs) {
+		for (Coordinate c: cs) {
+			highlighted.add(c);
+		}
+	}
+
+	public void unHighlight(Collection<Coordinate> cs) {
+		for (Coordinate c: cs) {
+			highlighted.remove(c);
+		}
+	}
 
 	public void clearHighlight() {
-		highlighted = new ArrayList<Coordinate>();
+		highlighted = new HashSet<Coordinate>();
 	}
 
 	@Override
@@ -167,7 +181,7 @@ public class BoardCanvas extends JPanel{
 
 	public void restart(Board game) {
 		this.game = game;
-		highlighted = new ArrayList<Coordinate>();
+		highlighted = new HashSet<Coordinate>();
 		
 	}
 
