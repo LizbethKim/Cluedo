@@ -148,6 +148,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			int yCoord = (int) ((e.getY() - canvas.getBoardTop() - boardCanvasTop) / canvas.getSquareWidth());
 			Coordinate c = new Coordinate(xCoord, yCoord);
 			if (game.getState() == 1) {
+				// A move is to be made
 				int moveResult = game.move(c);
 				infoPane.displayMovesLeft(game.getMovesLeft());
 				canvas.repaint();
@@ -155,38 +156,20 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 					this.doSuggestion();
 				}
 			} else if (game.getState() == 0 && game.getRoom(c) == Board.MIDDLE) {
+				// An accusation is to be made
 				int guess = new SuggestDialog(0).getGuess();
 				int result = game.accuse(guess);
 				if (result == Board.SUCCESS) {
 					if (game.getState() == 5) {
-						JOptionPane.showMessageDialog(this, "Game over, " + players.get(currentPlayer) + " won!");
-						int playAgain = JOptionPane.showConfirmDialog(this, "Play again?", "", JOptionPane.YES_NO_OPTION);
-						if (playAgain == JOptionPane.YES_OPTION) {
-							try {
-								this.restart(Main.createBoardFromFile("board.txt"));
-							} catch (IOException err) {
-								System.out.println(e);
-							}
-						} else {
-							System.exit(0);
-						}
+						gameOver(currentPlayer);
 					}
 				} else if (result == Board.FAIL) {
 					JOptionPane.showMessageDialog(this, "Incorrect guess, you lose!");
 					JOptionPane.showMessageDialog(this, players.get(currentPlayer) + " has lost and may no longer play except to refute.");
 					if (game.getState() == 5) {
-						JOptionPane.showMessageDialog(this, "Game over!");
-						int playAgain = JOptionPane.showConfirmDialog(this, "Play again?", "", JOptionPane.YES_NO_OPTION);
-						if (playAgain == JOptionPane.YES_OPTION) {
-							try {
-								this.restart(Main.createBoardFromFile("board.txt"));
-							} catch (IOException err) {
-								System.out.println(e);
-							}
-						} else {
-							System.exit(0);
-						}
+						gameOver(0);
 					}
+					this.endTurn();
 				} else {
 					System.out.println("guess should not have been made");
 				}
@@ -196,6 +179,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 							|| (game.getRoom() == Board.STUDY && game.getRoom(c) == Board.KITCHEN)
 							|| (game.getRoom() == Board.CONSERVATORY && game.getRoom(c) == Board.LOUNGE)
 							|| (game.getRoom() == Board.LOUNGE && game.getRoom(c) == Board.CONSERVATORY))) {
+				// Trying to take a passage
 				if (game.takePassage()) {
 					this.doSuggestion();
 					
@@ -209,23 +193,12 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			infoPane.displayMovesLeft(newRoll);
 			game.rollDice(newRoll);
 		}
-		
-		
-
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("End Turn")) {
-			dicePane.setRolled(false);
-			game.nextTurn();
-			infoPane.clear();
-			currentPlayer = game.currentPlayer();
-			list.setPlayer(0);
-			cardCanvas.updateCards(new ArrayList<Integer>());
-			JOptionPane.showMessageDialog(CluedoUI.this, "It's " + players.get(currentPlayer) + "'s turn as " + CluedoUI.asString(currentPlayer) +"!");
-			list.setPlayer(currentPlayer);
-			cardCanvas.updateCards(game.getPlayerCards());
+			this.endTurn();
 		} else if (e.getActionCommand().equals("Rules")) {
 			this.showRules();
 		} else if (e.getActionCommand().equals("Help")) {
@@ -236,6 +209,53 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			} catch (IOException err) {
 				System.out.println(err);
 			}
+		}
+	}
+	
+	private void endTurn() {
+		dicePane.setRolled(false);
+		game.nextTurn();
+		infoPane.clear();
+		currentPlayer = game.currentPlayer();
+		list.setPlayer(0);
+		cardCanvas.updateCards(new ArrayList<Integer>());
+		JOptionPane.showMessageDialog(CluedoUI.this, "It's " + players.get(currentPlayer) + "'s turn as " + CluedoUI.asString(currentPlayer) +"!");
+		list.setPlayer(currentPlayer);
+		cardCanvas.updateCards(game.getPlayerCards());
+	}
+	
+	private void doSuggestion() {
+		int guess = new SuggestDialog(game.getRoom()).getGuess();
+		if (game.suggest(guess)) {
+			canvas.repaint();
+			List<Integer> cardsToRefuteFrom = game.getPlayerCards(game.getRefutePlayer());
+			String[] cards = new String[cardsToRefuteFrom.size()];
+			for (int i = 0; i < cards.length; i++) {
+				cards[i] = asString(cardsToRefuteFrom.get(i));
+			}
+			JComboBox<String> comboBox = new JComboBox<String> (cards);
+			JPanel panel = new JPanel();
+			panel.add(new JLabel("Refute with which card?"));
+			//JOptionPane.showMessageDialog(this, message);
+			
+		}
+	}
+	
+	private void gameOver(int winner) {
+		if (winner == 0) {
+			JOptionPane.showMessageDialog(this, "Game over! All players lost");
+		} else {
+			JOptionPane.showMessageDialog(this, "Game over, " + players.get(winner) + " won!");
+		}
+		int playAgain = JOptionPane.showConfirmDialog(this, "Play again?", "", JOptionPane.YES_NO_OPTION);
+		if (playAgain == JOptionPane.YES_OPTION) {
+			try {
+				this.restart(Main.createBoardFromFile("board.txt"));
+			} catch (IOException err) {
+				System.out.println(err);
+			}
+		} else {
+			System.exit(0);
 		}
 	}
 	
@@ -283,24 +303,6 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		}
 	}
 	
-	private void doSuggestion() {
-		int guess = new SuggestDialog(game.getRoom()).getGuess();
-		if (game.suggest(guess)) {
-			canvas.repaint();
-			List<Integer> cardsToRefuteFrom = game.getPlayerCards(game.getRefutePlayer());
-			String[] cards = new String[cardsToRefuteFrom.size()];
-			for (int i = 0; i < cards.length; i++) {
-				cards[i] = asString(cardsToRefuteFrom.get(i));
-			}
-			JComboBox<String> comboBox = new JComboBox<String> (cards);
-			JPanel panel = new JPanel();
-			panel.add(new JLabel("Refute with which card?"));
-			//JOptionPane.showMessageDialog(this, message);
-			
-		}
-	}
-	
-	
 	/**
 	 * Starts the game passed in, shows initial setup dialog.
 	 * @param game
@@ -325,36 +327,9 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		
 		JOptionPane.showMessageDialog(this, panel, "Welcome to Cluedo!", JOptionPane.PLAIN_MESSAGE);
 
-
-		/*
-		 * LIZ LOOK HERE.
-		 * this is where there's the issue. I've tried fixing it by making a new
-		 * thread here, and it works fine the first time, but if you then go
-		 * menu -> restart, it doesn't work. That's when it's called from
-		 * actionPerformed (one method up from here).
-		 */
 		SuccessThread r = new SuccessThread (game, comboBox);
 		
 		r.start();
-		
-//		try {
-//			r.join();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-		
-		// FIXME doesn't actually show second time round.
-//		SelectPlayerDialog s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
-//		while(!s.done()) {
-//			try {
-//				Thread.sleep(100);
-//			} catch (InterruptedException e1) {
-//				System.out.println(e1);
-//				e1.printStackTrace();
-//			}
-//		}
-//		s.dispose();
-		
 	}
 
 	/**

@@ -128,6 +128,7 @@ public class CheckPane extends JPanel {
       }
 
 	public void restart() {
+		remove(lists.get(currentPlayer));
 		lists = new HashMap<Integer, JList<CheckableItem>>();
 		for (int i = 1; i < 7; i++) {
 			final JList<CheckableItem> list = new JList<CheckableItem>(createData(cardNames));
@@ -147,6 +148,7 @@ public class CheckPane extends JPanel {
 			lists.put(i, list);
 		}
 		this.currentPlayer = 1;
+		repaint();
 	}
     
 }
