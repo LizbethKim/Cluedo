@@ -243,6 +243,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 					}
 				}
 				if (cards[0] == null) {
+					JOptionPane.showMessageDialog(this, players.get(game.getRefutePlayer()) + " couldn't refute the suggestion!");
 					if (game.refute(0) == Board.SUCCESS) {
 						JOptionPane.showMessageDialog(this, "<html><p>No one could refute" + players.get(currentPlayer) + "'s suggestion of<br>[" + asString(game.findChar(guess)) + " with the " + asString(game.findWeapon(guess)).toLowerCase() + " in the " + asString(game.findRoom(guess)).toLowerCase() +"]</p></html>");
 						return;
