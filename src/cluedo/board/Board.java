@@ -315,29 +315,59 @@ public class Board {
 
 	public Set<Coordinate> getPossibleMoves(){
 		//System.out.println(currentMove);
-		boolean[][] aSt = aStarBoard;
-		return recurseMoves(playerList.get(currentPlayer).getCoords(), 0, aSt);
+		List<Integer> roomsVisited = new ArrayList<Integer>();
+		if (playerList.get(currentPlayer).currentRoom() != 0){
+			List<Coordinate> roomExits = roomList.get(convertRoom(playerList.get(currentPlayer).currentRoom())).getExits();
+			Set<Coordinate> roomHighlight = new HashSet<Coordinate>();
+			for (Coordinate c:roomExits){
+				boolean[][] aSt = new boolean[board.length][board[0].length];
+				for (int i = 0; i < board.length; i++){
+					for (int j = 0; j < board[0].length; j++){
+						aSt[i][j] = aStarBoard[i][j];
+					}
+				}
+				aSt[c.getX()][c.getY()] = false;
+				roomHighlight.addAll(recurseMoves(c, 0, aSt, roomsVisited));
+			}
+			return roomHighlight;
+		}
+		boolean[][] aSt = new boolean[board.length][board[0].length];
+		for (int i = 0; i < board.length; i++){
+			for (int j = 0; j < board[0].length; j++){
+				aSt[i][j] = aStarBoard[i][j];
+			}
+		}
+		return recurseMoves(playerList.get(currentPlayer).getCoords(), 0, aSt, roomsVisited);
 	}
 
-	private Set<Coordinate> recurseMoves(Coordinate coords, int depth, boolean[][] aStar){
+	private Set<Coordinate> recurseMoves(Coordinate coords, int depth, boolean[][] aStar, List<Integer> roomsVisited){
 		Set<Coordinate> current = new HashSet<Coordinate>();
-		if (!coords.equals(playerList.get(currentPlayer).getCoords())) current.add(coords);
+		if (!coords.equals(playerList.get(currentPlayer).getCoords())){
+			if (board[coords.getX()][coords.getY()] instanceof Room){
+				if (!roomsVisited.contains(((Room) board[coords.getX()][coords.getY()]).getName())){
+					current.add(coords);
+					roomsVisited.add(((Room) board[coords.getX()][coords.getY()]).getName());
+				}
+			} else {
+				current.add(coords);
+			}
+		}
 		if (depth == currentMove) return current;
 		aStar[coords.getX()][coords.getY()] = false;
 		if (coords.getX() + 1 < board.length && aStar[coords.getX()+1][coords.getY()]){
-			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX()+1, coords.getY()), depth+1, aStar);
+			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX()+1, coords.getY()), depth+1, aStar, roomsVisited);
 			current.addAll(temp);
 		}
 		if (coords.getX() - 1 >= 0 && aStar[coords.getX()-1][coords.getY()]){
-			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX()-1, coords.getY()), depth+1, aStar);
+			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX()-1, coords.getY()), depth+1, aStar, roomsVisited);
 			current.addAll(temp);
 		}
 		if (coords.getY() + 1 < board[0].length && aStar[coords.getX()][coords.getY()+1]){
-			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX(), coords.getY() + 1), depth+1, aStar);
+			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX(), coords.getY() + 1), depth+1, aStar, roomsVisited);
 			current.addAll(temp);
 		}
 		if (coords.getY() - 1 >= 0 && aStar[coords.getX()][coords.getY()-1]){
-			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX(), coords.getY() - 1), depth+1, aStar);
+			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX(), coords.getY() - 1), depth+1, aStar, roomsVisited);
 			current.addAll(temp);
 		}
 		return current;
