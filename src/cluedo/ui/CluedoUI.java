@@ -28,6 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingWorker;
 
 import cluedo.Coordinate;
 import cluedo.Main;
@@ -324,37 +325,23 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		
 		JOptionPane.showMessageDialog(this, panel, "Welcome to Cluedo!", JOptionPane.PLAIN_MESSAGE);
 
-		
+
 		/*
 		 * LIZ LOOK HERE.
 		 * this is where there's the issue. I've tried fixing it by making a new
-		 * thread here, and it works fine the first time, but if you then go 
+		 * thread here, and it works fine the first time, but if you then go
 		 * menu -> restart, it doesn't work. That's when it's called from
 		 * actionPerformed (one method up from here).
 		 */
-		Thread r = new Thread () {
-			private SelectPlayerDialog s;			
-			@Override
-			public void run() {
-				s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
-				while (!s.done()) {
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-				s.dispose();
-			}
-		};
+		SuccessThread r = new SuccessThread (game, comboBox);
 		
 		r.start();
 		
-		try {
-			r.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			r.join();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
 		
 		// FIXME doesn't actually show second time round.
 //		SelectPlayerDialog s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
@@ -368,19 +355,10 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 //		}
 //		s.dispose();
 		
-		for (Integer p: players.keySet()) {
-			game.addPlayer(p);
-		}
-		game.startGame();
-		
-		currentPlayer = game.currentPlayer();
-		JOptionPane.showMessageDialog(CluedoUI.this, "It's " + players.get(currentPlayer) + "'s turn as " + CluedoUI.asString(currentPlayer) +"!");
-		list.setPlayer(currentPlayer);
-		cardCanvas.updateCards(game.getPlayerCards());	
 	}
-	
+
 	/**
-	 * Turns the integer values used within the program into the string that 
+	 * Turns the integer values used within the program into the string that
 	 * is its name.
 	 * @param gamePart the integer related to the component
 	 */
@@ -410,9 +388,9 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			default: return null;
 		}
 	}
-	
+
 	/**
-	 * Turns the integer values used within the program into the string that 
+	 * Turns the integer values used within the program into the string that
 	 * is its name.
 	 * @param gamePart the string related to the component
 	 */
@@ -442,9 +420,9 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			default: return 0;
 		}
 	}
-	
-	
-	
+
+
+
 	@Override
 	public void mousePressed(MouseEvent e) {
 	}
@@ -460,5 +438,38 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 	@Override
 	public void mouseExited(MouseEvent e) {
 	}
+    private class SuccessThread extends Thread {
+        private Board game;
+		private SelectPlayerDialog s;
+		private JComboBox comboBox;
+		
+        SuccessThread(Board game, JComboBox comboBox) {
+            this.game = game;
+            this.comboBox = comboBox;
+        }
+
+		@Override
+		public void run() {
+			s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
+			while (!s.done()) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			s.dispose();
+			
+			for (Integer p: players.keySet()) {
+				game.addPlayer(p);
+			}
+			game.startGame();
+
+			currentPlayer = game.currentPlayer();
+			JOptionPane.showMessageDialog(CluedoUI.this, "It's " + players.get(currentPlayer) + "'s turn as " + CluedoUI.asString(currentPlayer) +"!");
+			list.setPlayer(currentPlayer);
+			cardCanvas.updateCards(game.getPlayerCards());
+		}
+    }
 
 }
