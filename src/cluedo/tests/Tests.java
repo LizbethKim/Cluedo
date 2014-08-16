@@ -149,7 +149,7 @@ public class Tests {
 		board.startGame();
 		board.rollDice(4);
 		Set<Coordinate> meow = board.getPossibleMoves();
-		assertTrue(meow.size() == 8);
+		assertTrue(meow.size() == 7);
 	}
 
 
