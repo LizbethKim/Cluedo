@@ -11,5 +11,13 @@ will be displayed in the bottom right corner. If you travel less than
 this amount, you may travel again until you have used up your moves.
 Entering a room will end your movement.
 
+If your token has been moved into a room during play as part of 
+another player's suggestion, you may start your turn with a suggestion
+rather than rolling the dice. Click the room you are in instead of 
+rolling the dice if you wish to do this.
+
 Use the list down the right of the window to keep track of what you
 believe has been eliminated.
+
+When you refute another player's suggestion, ensure only that player
+can see the screen after you click refute.

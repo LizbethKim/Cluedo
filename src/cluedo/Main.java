@@ -15,8 +15,6 @@ public class Main {
 			Board board = createBoardFromFile("board.txt");
 			new CluedoUI(board);
 		} catch (IOException e) {e.printStackTrace();}
-		System.out.println("Populated");
-		//System.exit(0);
 	}
 	
 	
@@ -33,11 +31,12 @@ public class Main {
 			
 			if(width == -1) {				
 				width = line.length();
-			} else if(width != line.length()) {				
+			} else if(width != line.length()) {			
+				br.close();
 				throw new IllegalArgumentException("Input file \"" + filename + "\" is malformed; line " + lines.size() + " incorrect width.");
 			}			
 		}
-		
+		br.close();		
 		Board board = new Board(width,lines.size());
 		for(int y=0;y!=lines.size();++y) {
 			line = lines.get(y);
