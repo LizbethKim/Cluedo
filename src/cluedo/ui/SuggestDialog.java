@@ -43,6 +43,7 @@ public class SuggestDialog {
 		panel.add(new JLabel(" in the "));
 		DefaultComboBoxModel<String> roomStrings = new DefaultComboBoxModel<String>();
 		if (room == 0) {
+			accusation = true;
 			roomStrings.addElement(CluedoUI.asString(Board.STUDY));
 			roomStrings.addElement(CluedoUI.asString(Board.DINING));
 			roomStrings.addElement(CluedoUI.asString(Board.BILLARD));
@@ -53,7 +54,6 @@ public class SuggestDialog {
 			roomStrings.addElement(CluedoUI.asString(Board.LIBRARY));
 			roomStrings.addElement(CluedoUI.asString(Board.CONSERVATORY));
 		} else {
-			accusation = true;
 			roomStrings.addElement(CluedoUI.asString(room));
 		}
 		rooms = new JComboBox<String>(roomStrings);

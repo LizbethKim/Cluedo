@@ -130,36 +130,6 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		addMouseListener(this);
 
 		bottomPaneTop = canvas.getHeight() + boardCanvasTop;
-////		checkPaneLeft = canvas.getWidth();
-//
-//		JPanel panel = new JPanel();
-//		panel.add(new JLabel("How many players?"));
-//		DefaultComboBoxModel<Integer> model = new DefaultComboBoxModel<Integer>();
-//		model.addElement(3);
-//		model.addElement(4);
-//		model.addElement(5);
-//		model.addElement(6);
-//		JComboBox<Integer> comboBox = new JComboBox<Integer>(model);
-//		panel.add(comboBox);
-//		
-//		JOptionPane.showMessageDialog(this, panel, "Welcome to Cluedo!", JOptionPane.PLAIN_MESSAGE);
-//
-//		
-//		SelectPlayerDialog s = new SelectPlayerDialog(this, players, (int)comboBox.getSelectedItem());
-//		while(!s.done()) {
-//			try {
-//				Thread.sleep(100);
-//			} catch (InterruptedException e1) {
-//				System.out.println(e1);
-//				e1.printStackTrace();
-//			}
-//		}
-//		s.dispose();
-//		
-//		for (Integer p: players.keySet()) {
-//			game.addPlayer(p);
-//		}
-//		game.startGame();
 		this.restart(game);
 	}
 
@@ -194,7 +164,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 						int playAgain = JOptionPane.showConfirmDialog(this, "Play again?", "", JOptionPane.YES_NO_OPTION);
 						if (playAgain == JOptionPane.YES_OPTION) {
 							try {
-								this.restart(Main.createBoardFromFile("Board.txt"));
+								this.restart(Main.createBoardFromFile("board.txt"));
 							} catch (IOException err) {
 								System.out.println(e);
 							}
@@ -272,7 +242,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			}
 		} else if (e.getActionCommand().equals("Restart")) {
 			try {
-				this.restart(Main.createBoardFromFile("Board.txt"));
+				this.restart(Main.createBoardFromFile("board.txt"));
 			} catch (IOException err) {
 				System.out.println(err);
 			}
@@ -280,6 +250,10 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 
 	}
 	
+	/**
+	 * Starts the game passed in, shows initial setup dialog.
+	 * @param game
+	 */
 	private void restart(Board game) {
 		
 		this.game = game;
@@ -289,6 +263,9 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		this.list.restart();
 		this.currentPlayer = 1;
 		players = new HashMap<Integer, String>();
+		repaint();
+		
+		JOptionPane.showMessageDialog(this, "See 'help'and 'rules' in the game menu to learn how to play.", "Welcome to Cluedo!", JOptionPane.PLAIN_MESSAGE);
 		
 		JPanel panel = new JPanel();
 		panel.add(new JLabel("How many players?"));
@@ -302,8 +279,8 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		
 		JOptionPane.showMessageDialog(this, panel, "Welcome to Cluedo!", JOptionPane.PLAIN_MESSAGE);
 
-		
-		SelectPlayerDialog s = new SelectPlayerDialog(this, players, (int)comboBox.getSelectedItem());
+		// FIXME doesn't actually show second time round.
+		SelectPlayerDialog s = new SelectPlayerDialog(null, players, (int)comboBox.getSelectedItem());
 		while(!s.done()) {
 			try {
 				Thread.sleep(100);
@@ -317,7 +294,12 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		for (Integer p: players.keySet()) {
 			game.addPlayer(p);
 		}
-		game.startGame();	
+		game.startGame();
+		
+		currentPlayer = game.currentPlayer();
+		JOptionPane.showMessageDialog(CluedoUI.this, "It's " + players.get(currentPlayer) + "'s turn as " + CluedoUI.asString(currentPlayer) +"!");
+		list.setPlayer(currentPlayer);
+		cardCanvas.updateCards(game.getPlayerCards());	
 	}
 	
 	/**

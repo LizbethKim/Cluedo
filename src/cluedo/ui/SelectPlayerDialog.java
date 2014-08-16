@@ -71,6 +71,9 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 	    }
 	    whole.add(okPanel);
 	    whole.setPreferredSize(new Dimension(400, 175));
+	    whole.repaint();
+	    whole.validate();
+	    
 
 	    add(whole);
 	    setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -78,7 +81,7 @@ public class SelectPlayerDialog extends JDialog implements ActionListener {
 		setResizable(false);
 		setLocationRelativeTo(f);
 		setVisible(true);
-
+		System.out.println(this);
 	}
 
 	public boolean done() {

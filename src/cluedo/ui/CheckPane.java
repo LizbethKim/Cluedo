@@ -51,8 +51,6 @@ public class CheckPane extends JPanel {
 	
 		TitledBorder titled = new TitledBorder("Cards Seen");
 		setBorder(titled);
-		add(lists.get(currentPlayer), BorderLayout.CENTER);
-		
 	}
 
 	/**
