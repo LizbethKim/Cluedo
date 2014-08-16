@@ -421,24 +421,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		}
 	}
 
-
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-	}
-    private class SuccessThread extends Thread {
+	private class SuccessThread extends Thread {
         private Board game;
 		private SelectPlayerDialog s;
 		private JComboBox comboBox;
@@ -471,5 +454,22 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			cardCanvas.updateCards(game.getPlayerCards());
 		}
     }
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+	}
+    
 
 }
