@@ -31,7 +31,7 @@ import javax.swing.JTextArea;
 
 import cluedo.Coordinate;
 import cluedo.Main;
-import cluedo.board.Board;
+import cluedo.models.Board;
 
 /**
  * The main window of the UI for the game. Also has control responsibilities.

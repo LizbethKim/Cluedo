@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import cluedo.board.Board;
+import cluedo.models.Board;
 import cluedo.ui.CluedoUI;
 
 public class Main {

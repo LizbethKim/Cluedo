@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cluedo.Coordinate;
-import cluedo.board.Board;
 
 public class Player implements Comparable{
 

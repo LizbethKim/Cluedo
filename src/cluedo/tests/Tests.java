@@ -11,7 +11,7 @@ import org.junit.Test;
 import cluedo.AStar;
 import cluedo.Coordinate;
 import cluedo.Main;
-import cluedo.board.Board;
+import cluedo.models.Board;
 import cluedo.models.Player;
 
 

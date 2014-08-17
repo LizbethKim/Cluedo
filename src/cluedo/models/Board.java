@@ -1,4 +1,4 @@
-package cluedo.board;
+package cluedo.models;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,16 +10,6 @@ import java.util.Set;
 
 import cluedo.AStar;
 import cluedo.Coordinate;
-import cluedo.models.Card;
-import cluedo.models.CharCard;
-import cluedo.models.Hallway;
-import cluedo.models.Player;
-import cluedo.models.Room;
-import cluedo.models.RoomCard;
-import cluedo.models.Square;
-import cluedo.models.UnreachableRoom;
-import cluedo.models.Wall;
-import cluedo.models.WeaponCard;
 
 public class Board {
 
