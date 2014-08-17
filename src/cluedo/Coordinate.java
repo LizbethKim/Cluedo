@@ -3,7 +3,12 @@ package cluedo;
 public class Coordinate {
 
 	private int x, y;
-	
+
+	/**
+	 * Creates a coordinate object to deal with representation of the board
+	 * @param x X position
+	 * @param y Y position
+	 */
 	public Coordinate(int x, int y){
 		this.x = x;
 		this.y = y;
@@ -16,7 +21,7 @@ public class Coordinate {
 	public int getY() {
 		return y;
 	}
-	
+
 	/**
 	 * Adds two coordinates together and returns the result.
 	 * @param one
@@ -51,9 +56,9 @@ public class Coordinate {
 			return false;
 		return true;
 	}
-	
+
 	public String toString() {
 		return "(" + x + ", " + y + ")";
-		
+
 	}
 }

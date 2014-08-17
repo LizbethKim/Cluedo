@@ -34,6 +34,10 @@ public class Room implements Square{
 		return true;
 	}
 
+	/**
+	 * Room object
+	 * @param name Room ENUM
+	 */
 	public Room(int name){
 		this.name = name;
 		this.passage = 0;
@@ -44,27 +48,27 @@ public class Room implements Square{
 	public void addExit(Coordinate coord){
 		exits.add(coord);
 	}
-	
+
 	public List<Coordinate> getExits(){
 		return exits;
 	}
-	
+
 	public int getName(){
 		return name;
 	}
-	
+
 	public List<Card> getCards(){
 		return cards;
 	}
-	
+
 	public void addCard(Card card){
 		cards.add(card);
 	}
-	
+
 	public void addPassage(int x){
 		passage = x;
 	}
-	
+
 	public int getPassage(){
 		return passage;
 	}

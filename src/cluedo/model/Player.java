@@ -15,6 +15,13 @@ public class Player implements Comparable{
 	private boolean playable;
 	private boolean suggestable;
 
+	/**
+	 * Player object
+	 * @param character Character enum
+	 * @param x Current X Position
+	 * @param y Current Y Position
+	 * @param playable Whether the character is playable
+	 */
 	public Player(int character, int x, int y, boolean playable){
 		this.character = character;
 		cards = new ArrayList<Card>();

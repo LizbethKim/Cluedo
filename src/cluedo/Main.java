@@ -9,34 +9,39 @@ import cluedo.model.Board;
 import cluedo.ui.CluedoUI;
 
 public class Main {
-	
+
 	public static void main(String[] args){
 		try {
 			Board board = createBoardFromFile("board.txt");
 			new CluedoUI(board);
 		} catch (IOException e) {e.printStackTrace();}
 	}
-	
-	
-	
-	public static Board createBoardFromFile(String filename) throws IOException {		
-		FileReader fr = new FileReader(filename);		
+
+
+	/**
+	 * Creates the board from a board.txt file.
+	 * @param filename File name of the board file
+	 * @return A Board object
+	 * @throws IOException For if invalid file
+	 */
+	public static Board createBoardFromFile(String filename) throws IOException {
+		FileReader fr = new FileReader(filename);
 		BufferedReader br = new BufferedReader(fr);
 		ArrayList<String> lines = new ArrayList<String>();
 		int width = -1;
-		String line;		
+		String line;
 		while((line = br.readLine()) != null) {
 			lines.add(line);
 			// now sanity check
-			
-			if(width == -1) {				
+
+			if(width == -1) {
 				width = line.length();
-			} else if(width != line.length()) {			
+			} else if(width != line.length()) {
 				br.close();
 				throw new IllegalArgumentException("Input file \"" + filename + "\" is malformed; line " + lines.size() + " incorrect width.");
-			}			
+			}
 		}
-		br.close();		
+		br.close();
 		Board board = new Board(width,lines.size());
 		for(int y=0;y!=lines.size();++y) {
 			line = lines.get(y);
@@ -58,7 +63,7 @@ public class Main {
 				}
 			}
 		}
-			
+
 		return board;
 	}
 }

@@ -71,6 +71,12 @@ public class Board {
 	 */
 	private int currentState;
 
+	/**
+	 * Creates a new instance of the Board. This initializes the playerLists, charLists, Coordinates
+	 * of the rooms, current board state and everything required to play the game.
+	 * @param x Board Size X
+	 * @param y Board Size Y
+	 */
 	public Board(int x, int y){
 		board = new Square[x][y];
 		currentState = -1;
@@ -84,11 +90,14 @@ public class Board {
 		generateRoomList();
 	}
 
-	//Return moves remaining for the player
+	//Return moves remaining for the player. Didn't javadoc because self explanatory (According to google JavaDoc guidelines)
 	public int getMovesLeft(){
 		return currentMove;
 	}
-	
+
+	/**
+	 * Gives a terminal representation for the board. Helps with debugging without a UI
+	 */
 	public void printBoard(){
 		for (int i = 0; i < board[0].length; i++){
 			for (int j = 0; j < board.length; j++){
@@ -125,7 +134,7 @@ public class Board {
 	}
 
 
-	/*
+	/**
 	 * Sets the number of players, sorts players into order, sets current player
 	 * creates new "Can go" map, sets state to first state.
 	 */
@@ -190,7 +199,13 @@ public class Board {
 
 
 
-	//Must ensure Player's room is set correctly before attempting this
+	/**
+	 * Must ensure that the room passages are set correctly before attempting this.
+	 * This will let the player take the passage on state 0 (before a dice roll)
+	 * if there is one in the room. Otherwise the player will not be able to move
+	 * and state doesn't change.
+	 * @return Success/Failure
+	 */
 	public boolean takePassage(){
 		if (currentState == 0){
 			if (playerList.get(currentPlayer).currentRoom() != NOTHING){
@@ -208,7 +223,7 @@ public class Board {
 		}
 		return false;
 	}
-	
+
 	public void addMiddleRoom(int x, int y) {
 		board[x][y] = new UnreachableRoom();
 	}
@@ -219,11 +234,17 @@ public class Board {
 		return NOTHING;
 	}
 
+	/**
+	 * When a player gets moved to a room because of a suggestion, they should be able
+	 * to make a suggestion rather than move for their turn. This returns whether this
+	 * is possible or not.
+	 * @return Whether the player can suggest or not.
+	 */
 	public boolean canSuggest(){
 		return playerList.get(currentPlayer).isSuggestable();
 	}
 
-	/*
+	/**
 	 * Suggest mechanism, suggest an ENUM combination (3 numbers). Returns true if it's valid to suggest at the time
 	 * else returns false if invalid. CAN ONLY SUGGEST IN STATE 2 -AFTER- the movement.
 	 */
@@ -250,8 +271,12 @@ public class Board {
 	}
 
 	/**
-	 *
-	 * @param suggestion
+	 * Starts the accusation process. If the state is 0 or after movement, you can accuse.
+	 * During the accusation process, it will determine whether the accusation was a valid
+	 * one by checking the card ranges. Upon being a valid accusation, it will then see if
+	 * the suggestion was correct and end the game, or remove the player from the game if
+	 * incorrect.
+	 * @param suggestion 3 digit unique ENUM for the card combinations
 	 * @return SUCCESS if a correct guess, FAIL if incorrect, NOTHING if the
 	 * guess was an invalid guess or made at an invalid time.
 	 */
@@ -279,7 +304,11 @@ public class Board {
 		return playerList.get(currentPlayer).currentRoom();
 	}
 
-	//If given coords, checks whether that's a room and returns the room's ENUM or NOTHING
+	/**
+	 * Checks whether the coordinate's a room and returns the room's ENUM or NOTHING
+	 * @param coord Coordinates of the place you want to check
+	 * @return
+	 */
 	public int getRoom(Coordinate coord){
 		if (board[coord.getX()][coord.getY()] instanceof Room){
 			return ((Room) board[coord.getX()][coord.getY()]).getName();
@@ -290,6 +319,12 @@ public class Board {
 		}
 	}
 
+	/**
+	 * For generating the "Highlighted" movable area on the map. Given a certain distance
+	 * it will return a set of coordinates that are reachable from the current player's
+	 * position.
+	 * @return Set of Coordinates that player can reach
+	 */
 	public Set<Coordinate> getPossibleMoves(){
 		//System.out.println(currentMove);
 		List<Integer> roomsVisited = new ArrayList<Integer>();
@@ -317,11 +352,12 @@ public class Board {
 		return recurseMoves(playerList.get(currentPlayer).getCoords(), 0, aSt, roomsVisited);
 	}
 
-	
-	/*
-	 * Refuting mechanism. Will take a card ENUM, and return a NOTHING if the player refuted nothing (passing)
-	 * or the card ENUM if the refute is successful, or SUCCESS if the player's suggestion goes through. If it's
-	 * not the correct state to refute, returns FAIL
+	/**
+	 * Refuting mechanism. Will take a card ENUM and return a NOTHING if the player refuted nothing (passing)
+	 * or the card's ENUM if the refute is successful, or SUCCESS if the player's suggestion goes through. If it's
+	 * not the correct state to refute, returns FAIL.
+	 * @param cardNum Card's ENUM value
+	 * @return Fail/Success/Nothing result of the refute attempt
 	 */
 	public int refute(int cardNum){
 		if (currentState != 3) return FAIL;
@@ -348,7 +384,10 @@ public class Board {
 		return INVALIDCARD;
 	}
 
-	//Starts the next turn. Should only be called by Board.
+	/**
+	 * Starts the next turn. Assumes that the UI is aware of the state and will not
+	 * call nextTurn() improperly. Also just returns if the game is over.
+	 */
 	public void nextTurn(){
 		if (currentState == 5) return;
 		int tempCurrentPlayer = currentPlayer;
@@ -386,6 +425,12 @@ public class Board {
 		return (character%10);
 	}
 
+	/**
+	 * Takes in a dice roll from the UI. It's generated similarly to the way a real player would roll
+	 * the dice. The roll is taken from the UI and stored in the "currentMove" field.
+	 * @param roll Dice roll given by UI
+	 * @return Success or Failure of the dice roll based on state
+	 */
 	public boolean rollDice(int roll){
 		if (currentState == 0) {
 			currentMove = roll;
@@ -399,6 +444,12 @@ public class Board {
 		return currentState;
 	}
 
+	/**
+	 * Adds the character to the current game. Assumes multiples will not be sent to the board
+	 * (Handled by a JDialog panel).
+	 * @param chara The character's ENUM
+	 * @return Success/Fail based on current state.
+	 */
 	public boolean addPlayer(int chara){
 		if (currentState != -1){
 			return false;
@@ -408,17 +459,25 @@ public class Board {
 			return true;
 		}
 	}
-	
+
 	public void addWall(int x, int y) {
 		board[x][y] = new Wall();
 	}
 	public void addHallway(int x, int y) {
-		board[x][y] = new Hallway(new Coordinate(x, y));
+		board[x][y] = new Hallway();
 	}
 	public void addRoom(int x, int y, int room){
 		board[x][y] = roomList.get(room);
 	}
 
+	/**
+	 * Checks whether the move is a valid distance, then attempts to AStar. Upon success, updates the player's coordinates
+	 * and returns SUCCESS. Also detects whether there are more moves possible, upon which it will return NOTHING, or FAIL
+	 * if it's an invalid move location or too far. When moving into/out of a room, it will automatically pick the best
+	 * exit to leave/enter the room. Also doesn't allow the player to move into the same room.
+	 * @param endPoint The coordinates to attempt to move to
+	 * @return Results of the move attempt. SUCCESS/FAIL/NOTHING
+	 */
 	public int move(Coordinate endPoint){
 		if (!(endPoint.getX() >= 0) && !(endPoint.getX() < aStarBoard.length) && !(endPoint.getY() >= 0) && !(endPoint.getY() < aStarBoard[0].length)) return FAIL;
 		if (!aStarBoard[endPoint.getX()][endPoint.getY()]) return FAIL; //If it's impossible to move to the end position returns fail
@@ -459,9 +518,11 @@ public class Board {
 	}
 
 
-	/*
-	 * Simple A* Algorithm, returns the path if possible, else null. Should never null as all the logic
-	 * should be checked by the move command.
+	/**
+	 * Simple A* algorithm from start to finish.
+	 * @param startPoint Start point of the A*
+	 * @param endPoint End point of the A*
+	 * @return AStar object that contains the path from start to finish and length
 	 */
 	public AStar aStar(Coordinate startPoint, Coordinate endPoint){
 		boolean[][] tempStarBoard = aStarBoard();
@@ -498,13 +559,19 @@ public class Board {
 		}
 		return null;
 	}
-	
+
 	//Beware: Dragons. And private classes after this point.
 
 	private boolean visited(Coordinate coords, boolean[][] aStarBoard){
 		return !(aStarBoard[coords.getX()][coords.getY()]);
 	}
 
+	/**
+	 * Finds the best exit out of a room
+	 * @param room Current room
+	 * @param endPoint The coordinate you want to travel to/from
+	 * @return Coordinates of the best exit
+	 */
 	private Coordinate bestExit(Room room, Coordinate endPoint){
 		int min = Integer.MAX_VALUE;
 		Coordinate bestExit = new Coordinate(0, 0);
@@ -516,7 +583,7 @@ public class Board {
 		}
 		return bestExit;
 	}
-	
+
 	//Moves the variable to the next player/state. Again should only be called by Board
 	private void moveRefute(){
 		refutePlayer = (refutePlayer + 1) % numPlayers;
@@ -530,24 +597,32 @@ public class Board {
 		currentPlayer = (currentPlayer + 1) % numPlayers;
 	}
 
-	
+	/**
+	 * This is very long. But essentially it's a recursive breadth (tehehe bread) first search from the origin
+	 * with the terminating depth being the current move pool.
+	 * @param coords Current Coordinates
+	 * @param depth Current depth
+	 * @param aStar a 2d array of booleans representing whether you can move to that location or not
+	 * @param roomsVisited Ensures you don't highlight the rest of the room, or revisit the room you're currently in
+	 * @return Set of Coordinates you can go to from current coordinate
+	 */
 	private Set<Coordinate> recurseMoves(Coordinate coords, int depth, boolean[][] aStar, List<Integer> roomsVisited){
 		Set<Coordinate> current = new HashSet<Coordinate>();
-		if (!coords.equals(playerList.get(currentPlayer).getCoords())){
+		if (!coords.equals(playerList.get(currentPlayer).getCoords())){ //Checks that it's not the original coordinate player started on
 			if (board[coords.getX()][coords.getY()] instanceof Room){
-				if (!roomsVisited.contains(((Room) board[coords.getX()][coords.getY()]).getName())){
+				if (!roomsVisited.contains(((Room) board[coords.getX()][coords.getY()]).getName())){ //Ensures that the room hasn't been visited yet
 					current.add(coords);
-					roomsVisited.add(((Room) board[coords.getX()][coords.getY()]).getName());
+					roomsVisited.add(((Room) board[coords.getX()][coords.getY()]).getName()); //Adds to the rooms visited node
 				}
 			} else {
 				current.add(coords);
 			}
 		}
 		if (depth == currentMove) return current;
-		aStar[coords.getX()][coords.getY()] = false;
+		aStar[coords.getX()][coords.getY()] = false; //Sets flag to false so you don't revisit this coordinate
 		if (coords.getX() + 1 < board.length && aStar[coords.getX()+1][coords.getY()]){
 			boolean[][] aSt = new boolean[board.length][board[0].length];
-			for (int i = 0; i < board.length; i++){
+			for (int i = 0; i < board.length; i++){ //Deep clone of the current 2d array to recurse
 				for (int j = 0; j < board[0].length; j++){
 					aSt[i][j] = aStar[i][j];
 				}
@@ -588,10 +663,23 @@ public class Board {
 		return current;
 	}
 
+	/**
+	 * Just returns the heuristic (absolute distance) from one point to another
+	 * @param startPoint Starting point
+	 * @param endPoint End point
+	 * @return Integer of how many squares away it is
+	 */
 	private int getDistance(Coordinate startPoint, Coordinate endPoint){
 		return (Math.abs(startPoint.getX() - endPoint.getX()) + Math.abs(startPoint.getY() - endPoint.getY()));
 	}
 
+	/**
+	 * Adding player to the game. Adds a character through their enum. Boolean guard there to see whether it's
+	 * a player character or a non-player object
+	 * @param chara Character Enum
+	 * @param player Boolean guard for playability
+	 * @return Returns the player object that was created
+	 */
 	private Player addPlayer(int chara, boolean player){
 		if (currentState != -1){
 			return null;
@@ -614,6 +702,10 @@ public class Board {
 		}
 	}
 
+	/**
+	 * Generates room coordinates for the center of the room. Skips 0 for aesthetics to make
+	 * it relate to the room ENUMs
+	 */
 	private void generateRoomCoords(){
 		roomCoords.add(new Coordinate(0, 0)); //Skipping 0 for aesthetics purposes
 		roomCoords.add(new Coordinate(2, 4));
@@ -627,6 +719,9 @@ public class Board {
 		roomCoords.add(new Coordinate(3, 12));
 	}
 
+	/**
+	 * Creates the roomlist, which contains every room and all their exits. Hard coded for CLUEDO
+	 */
 	private void generateRoomList(){
 		roomList.add(new Room(NOTHING));
 		roomList.add(new Room(KITCHEN));
@@ -661,6 +756,10 @@ public class Board {
 		roomList.get(8).addPassage(CONSERVATORY);
 	}
 
+	/**
+	 * Creates a new 2d array of all the places that can currently be travelled on the board
+	 * @return 2d Array of the travellable places
+	 */
 	private boolean[][] aStarBoard(){
 		boolean[][] aStarBoard = new boolean[board.length][board[0].length];
 		for (int i = 0; i < board[0].length; i++){
@@ -680,6 +779,9 @@ public class Board {
 	}
 
 
+	/**
+	 * Creates the character list of all characters. Player list just handles playable characters.
+	 */
 	private void populateCharList(){
 		charList.add(new Player(0, 0, 0, false));
 		for (int i = 1; i < 7; i++){
@@ -687,6 +789,9 @@ public class Board {
 		}
 	}
 
+	/**
+	 * Distributes the cards and picks 3 random ones to be the solution for the game.
+	 */
 	private void cardDistribution(){
 		List<Card> allCards = new ArrayList<Card>();
 		int chara = (int) ((Math.random()*6)+1);
