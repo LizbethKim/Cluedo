@@ -179,7 +179,7 @@ public class Tests {
 
 	public Board makeBoard(){
 		try {
-			Board board = Main.createBoardFromFile("board.txt");
+			Board board = Main.createBoardFromFile("assets/board.txt");
 			return board;
 		} catch (IOException e) {
 			e.printStackTrace();

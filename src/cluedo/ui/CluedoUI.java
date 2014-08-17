@@ -216,7 +216,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			this.showHelp();
 		} else if (e.getActionCommand().equals("Restart")) {
 			try {
-				this.restart(Main.createBoardFromFile("board.txt"));
+				this.restart(Main.createBoardFromFile("assets/board.txt"));
 			} catch (IOException err) {
 				System.out.println(err);
 			}
@@ -301,7 +301,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		int playAgain = JOptionPane.showConfirmDialog(this, "Play again?", "", JOptionPane.YES_NO_OPTION);
 		if (playAgain == JOptionPane.YES_OPTION) {
 			try {
-				this.restart(Main.createBoardFromFile("board.txt"));
+				this.restart(Main.createBoardFromFile("assets/board.txt"));
 			} catch (IOException err) {
 				System.out.println(err);
 			}

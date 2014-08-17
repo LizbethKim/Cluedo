@@ -12,7 +12,7 @@ public class Main {
 
 	public static void main(String[] args){
 		try {
-			Board board = createBoardFromFile("board.txt");
+			Board board = createBoardFromFile("assets/board.txt");
 			new CluedoUI(board);
 		} catch (IOException e) {e.printStackTrace();}
 	}
