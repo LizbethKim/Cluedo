@@ -355,19 +355,43 @@ public class Board {
 		if (depth == currentMove) return current;
 		aStar[coords.getX()][coords.getY()] = false;
 		if (coords.getX() + 1 < board.length && aStar[coords.getX()+1][coords.getY()]){
-			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX()+1, coords.getY()), depth+1, aStar, roomsVisited);
+			boolean[][] aSt = new boolean[board.length][board[0].length];
+			for (int i = 0; i < board.length; i++){
+				for (int j = 0; j < board[0].length; j++){
+					aSt[i][j] = aStar[i][j];
+				}
+			}
+			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX()+1, coords.getY()), depth+1, aSt, roomsVisited);
 			current.addAll(temp);
 		}
 		if (coords.getX() - 1 >= 0 && aStar[coords.getX()-1][coords.getY()]){
-			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX()-1, coords.getY()), depth+1, aStar, roomsVisited);
+			boolean[][] aSt = new boolean[board.length][board[0].length];
+			for (int i = 0; i < board.length; i++){
+				for (int j = 0; j < board[0].length; j++){
+					aSt[i][j] = aStar[i][j];
+				}
+			}
+			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX()-1, coords.getY()), depth+1, aSt, roomsVisited);
 			current.addAll(temp);
 		}
 		if (coords.getY() + 1 < board[0].length && aStar[coords.getX()][coords.getY()+1]){
-			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX(), coords.getY() + 1), depth+1, aStar, roomsVisited);
+			boolean[][] aSt = new boolean[board.length][board[0].length];
+			for (int i = 0; i < board.length; i++){
+				for (int j = 0; j < board[0].length; j++){
+					aSt[i][j] = aStar[i][j];
+				}
+			}
+			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX(), coords.getY() + 1), depth+1, aSt, roomsVisited);
 			current.addAll(temp);
 		}
 		if (coords.getY() - 1 >= 0 && aStar[coords.getX()][coords.getY()-1]){
-			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX(), coords.getY() - 1), depth+1, aStar, roomsVisited);
+			boolean[][] aSt = new boolean[board.length][board[0].length];
+			for (int i = 0; i < board.length; i++){
+				for (int j = 0; j < board[0].length; j++){
+					aSt[i][j] = aStar[i][j];
+				}
+			}
+			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX(), coords.getY() - 1), depth+1, aSt, roomsVisited);
 			current.addAll(temp);
 		}
 		return current;

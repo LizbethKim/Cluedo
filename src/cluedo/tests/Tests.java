@@ -167,9 +167,12 @@ public class Tests {
 		Board board = makeBoard();
 		board.addPlayer(1);
 		board.startGame();
-		board.rollDice(4);
+		board.rollDice(5);
 		Set<Coordinate> meow = board.getPossibleMoves();
-		assertTrue(meow.size() == 7);
+		System.out.println(meow.size());
+		for (Coordinate c:meow){
+			System.out.println(c);
+		}
 	}
 
 
