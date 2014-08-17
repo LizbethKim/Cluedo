@@ -1,4 +1,4 @@
-package cluedo.models;
+package cluedo.model;
 
 import java.util.ArrayList;
 import java.util.List;

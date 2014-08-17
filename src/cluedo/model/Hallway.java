@@ -1,4 +1,4 @@
-package cluedo.models;
+package cluedo.model;
 
 import cluedo.Coordinate;
 

@@ -13,7 +13,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import cluedo.models.Board;
+import cluedo.model.Board;
 
 /**
  * The panel of the UI that displays the cards in the hand of the current player

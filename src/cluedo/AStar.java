@@ -1,6 +1,6 @@
 package cluedo;
 
-import cluedo.models.Square;
+import cluedo.model.Square;
 
 
 public class AStar implements Comparable{

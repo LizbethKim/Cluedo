@@ -7,7 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import cluedo.models.Board;
+import cluedo.model.Board;
 
 public class SuggestDialog {
 	private JFrame parent;

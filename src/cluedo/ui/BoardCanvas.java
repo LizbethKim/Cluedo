@@ -18,7 +18,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import cluedo.Coordinate;
-import cluedo.models.Board;
+import cluedo.model.Board;
 
 
 /**

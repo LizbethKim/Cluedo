@@ -1,4 +1,4 @@
-package cluedo.models;
+package cluedo.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -90,37 +90,39 @@ public class Board {
 	public int getMovesLeft(){
 		return currentMove;
 	}
-
-	private void populateCharList(){
-		charList.add(new Player(0, 0, 0, false));
-		for (int i = 1; i < 7; i++){
-			charList.add(addPlayer(i, false));
-		}
-	}
-
-	private void cardDistribution(){
-		List<Card> allCards = new ArrayList<Card>();
-		int chara = (int) ((Math.random()*6)+1);
-		for (int i = 1; i < 7; i++){
-			if (i == chara) continue;
-			allCards.add(new CharCard(i));
-		}
-		int weapon = (int) ((Math.random()*6)+1)*10;
-		for (int i = 10; i < 70; i = i + 10){
-			if (i == weapon) continue;
-			allCards.add(new WeaponCard(i));
-		}
-		int roome = (int) ((Math.random()*9)+1)*100;
-		for (int i = 100; i < 1000; i = i + 100){
-			if (i == roome) continue;
-			allCards.add(new RoomCard(i));
-		}
-		solution = chara + weapon + roome;
-		Collections.shuffle(allCards);
-		int i = 0;
-		for (Card c : allCards){
-			playerList.get(i%numPlayers).addCard(c);
-			i++;
+	
+	public void printBoard(){
+		for (int i = 0; i < board[0].length; i++){
+			for (int j = 0; j < board.length; j++){
+				boolean isPlayer = false;
+				boolean isRoom = false;
+				for (Player p: playerList){
+					if (p.at(new Coordinate(j, i))){
+						System.out.print("P");
+						isPlayer = true;
+					}
+				}
+				if (!isPlayer){
+					for (Room r: roomList){
+						for (Coordinate c: r.getExits()){
+							if (c.getX() == j && c.getY() == i){
+								System.out.print("X");
+								isRoom = true;
+							}
+						}
+					}
+				}
+				if (!isPlayer && !isRoom){
+					if (board[j][i] instanceof Wall){
+						System.out.print("W");
+					} else if (board[j][i] instanceof Room){
+						System.out.print("E");
+					} else if (board[j][i] instanceof Hallway){
+						System.out.print(" ");
+					}
+				}
+			}
+			System.out.println("");
 		}
 	}
 
@@ -208,7 +210,10 @@ public class Board {
 		}
 		return false;
 	}
-
+	
+	public void addMiddleRoom(int x, int y) {
+		board[x][y] = new UnreachableRoom();
+	}
 
 	//Returns the current suggest attempt
 	public int currentSuggest(){
@@ -272,21 +277,6 @@ public class Board {
 		return NOTHING;
 	}
 
-	//For automating retrieving things from lists
-	private Player getPlayer(int character){
-		for (Player p:charList){
-			if (p.getChar() == character) return p;
-		}
-		return null;
-	}
-	private Room getRoom(int room){
-		for (Room r:roomList){
-			if (r.getName() == room) return r;
-		}
-		return null;
-	}
-
-
 	//If not given an argument, getRoom() returns the room of the current player. ENUM of room or NOTHING
 	public int getRoom(){
 		return playerList.get(currentPlayer).currentRoom();
@@ -330,64 +320,7 @@ public class Board {
 		return recurseMoves(playerList.get(currentPlayer).getCoords(), 0, aSt, roomsVisited);
 	}
 
-	private Set<Coordinate> recurseMoves(Coordinate coords, int depth, boolean[][] aStar, List<Integer> roomsVisited){
-		Set<Coordinate> current = new HashSet<Coordinate>();
-		if (!coords.equals(playerList.get(currentPlayer).getCoords())){
-			if (board[coords.getX()][coords.getY()] instanceof Room){
-				if (!roomsVisited.contains(((Room) board[coords.getX()][coords.getY()]).getName())){
-					current.add(coords);
-					roomsVisited.add(((Room) board[coords.getX()][coords.getY()]).getName());
-				}
-			} else {
-				current.add(coords);
-			}
-		}
-		if (depth == currentMove) return current;
-		aStar[coords.getX()][coords.getY()] = false;
-		if (coords.getX() + 1 < board.length && aStar[coords.getX()+1][coords.getY()]){
-			boolean[][] aSt = new boolean[board.length][board[0].length];
-			for (int i = 0; i < board.length; i++){
-				for (int j = 0; j < board[0].length; j++){
-					aSt[i][j] = aStar[i][j];
-				}
-			}
-			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX()+1, coords.getY()), depth+1, aSt, roomsVisited);
-			current.addAll(temp);
-		}
-		if (coords.getX() - 1 >= 0 && aStar[coords.getX()-1][coords.getY()]){
-			boolean[][] aSt = new boolean[board.length][board[0].length];
-			for (int i = 0; i < board.length; i++){
-				for (int j = 0; j < board[0].length; j++){
-					aSt[i][j] = aStar[i][j];
-				}
-			}
-			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX()-1, coords.getY()), depth+1, aSt, roomsVisited);
-			current.addAll(temp);
-		}
-		if (coords.getY() + 1 < board[0].length && aStar[coords.getX()][coords.getY()+1]){
-			boolean[][] aSt = new boolean[board.length][board[0].length];
-			for (int i = 0; i < board.length; i++){
-				for (int j = 0; j < board[0].length; j++){
-					aSt[i][j] = aStar[i][j];
-				}
-			}
-			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX(), coords.getY() + 1), depth+1, aSt, roomsVisited);
-			current.addAll(temp);
-		}
-		if (coords.getY() - 1 >= 0 && aStar[coords.getX()][coords.getY()-1]){
-			boolean[][] aSt = new boolean[board.length][board[0].length];
-			for (int i = 0; i < board.length; i++){
-				for (int j = 0; j < board[0].length; j++){
-					aSt[i][j] = aStar[i][j];
-				}
-			}
-			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX(), coords.getY() - 1), depth+1, aSt, roomsVisited);
-			current.addAll(temp);
-		}
-		return current;
-	}
-
-
+	
 	/*
 	 * Refuting mechanism. Will take a card ENUM, and return a NOTHING if the player refuted nothing (passing)
 	 * or the card ENUM if the refute is successful, or SUCCESS if the player's suggestion goes through. If it's
@@ -438,20 +371,6 @@ public class Board {
 		currentState = 5;
 	}
 
-	//Moves the variable to the next player/state. Again should only be called by Board
-	private void moveRefute(){
-		refutePlayer = (refutePlayer + 1) % numPlayers;
-	}
-
-	private void moveState(){
-		currentState = (currentState + 1) % 4;
-	}
-
-	private void movePlayer(){
-		currentPlayer = (currentPlayer + 1) % numPlayers;
-	}
-
-
 	//Converts a number into a single digit room ID number to access roomList (from a 3 digit combo)
 	public int convertRoom(int room){
 		return ((room/100)%10);
@@ -491,6 +410,16 @@ public class Board {
 			charList.get(chara).add();
 			return true;
 		}
+	}
+	
+	public void addWall(int x, int y) {
+		board[x][y] = new Wall();
+	}
+	public void addHallway(int x, int y) {
+		board[x][y] = new Hallway(new Coordinate(x, y));
+	}
+	public void addRoom(int x, int y, int room){
+		board[x][y] = roomList.get(room);
 	}
 
 	public int move(Coordinate endPoint){
@@ -572,6 +501,8 @@ public class Board {
 		}
 		return null;
 	}
+	
+	//Beware: Dragons. And private classes after this point.
 
 	private boolean visited(Coordinate coords, boolean[][] aStarBoard){
 		return !(aStarBoard[coords.getX()][coords.getY()]);
@@ -587,6 +518,77 @@ public class Board {
 			}
 		}
 		return bestExit;
+	}
+	
+	//Moves the variable to the next player/state. Again should only be called by Board
+	private void moveRefute(){
+		refutePlayer = (refutePlayer + 1) % numPlayers;
+	}
+
+	private void moveState(){
+		currentState = (currentState + 1) % 4;
+	}
+
+	private void movePlayer(){
+		currentPlayer = (currentPlayer + 1) % numPlayers;
+	}
+
+	
+	private Set<Coordinate> recurseMoves(Coordinate coords, int depth, boolean[][] aStar, List<Integer> roomsVisited){
+		Set<Coordinate> current = new HashSet<Coordinate>();
+		if (!coords.equals(playerList.get(currentPlayer).getCoords())){
+			if (board[coords.getX()][coords.getY()] instanceof Room){
+				if (!roomsVisited.contains(((Room) board[coords.getX()][coords.getY()]).getName())){
+					current.add(coords);
+					roomsVisited.add(((Room) board[coords.getX()][coords.getY()]).getName());
+				}
+			} else {
+				current.add(coords);
+			}
+		}
+		if (depth == currentMove) return current;
+		aStar[coords.getX()][coords.getY()] = false;
+		if (coords.getX() + 1 < board.length && aStar[coords.getX()+1][coords.getY()]){
+			boolean[][] aSt = new boolean[board.length][board[0].length];
+			for (int i = 0; i < board.length; i++){
+				for (int j = 0; j < board[0].length; j++){
+					aSt[i][j] = aStar[i][j];
+				}
+			}
+			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX()+1, coords.getY()), depth+1, aSt, roomsVisited);
+			current.addAll(temp);
+		}
+		if (coords.getX() - 1 >= 0 && aStar[coords.getX()-1][coords.getY()]){
+			boolean[][] aSt = new boolean[board.length][board[0].length];
+			for (int i = 0; i < board.length; i++){
+				for (int j = 0; j < board[0].length; j++){
+					aSt[i][j] = aStar[i][j];
+				}
+			}
+			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX()-1, coords.getY()), depth+1, aSt, roomsVisited);
+			current.addAll(temp);
+		}
+		if (coords.getY() + 1 < board[0].length && aStar[coords.getX()][coords.getY()+1]){
+			boolean[][] aSt = new boolean[board.length][board[0].length];
+			for (int i = 0; i < board.length; i++){
+				for (int j = 0; j < board[0].length; j++){
+					aSt[i][j] = aStar[i][j];
+				}
+			}
+			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX(), coords.getY() + 1), depth+1, aSt, roomsVisited);
+			current.addAll(temp);
+		}
+		if (coords.getY() - 1 >= 0 && aStar[coords.getX()][coords.getY()-1]){
+			boolean[][] aSt = new boolean[board.length][board[0].length];
+			for (int i = 0; i < board.length; i++){
+				for (int j = 0; j < board[0].length; j++){
+					aSt[i][j] = aStar[i][j];
+				}
+			}
+			Set<Coordinate> temp = recurseMoves(new Coordinate(coords.getX(), coords.getY() - 1), depth+1, aSt, roomsVisited);
+			current.addAll(temp);
+		}
+		return current;
 	}
 
 	private int getDistance(Coordinate startPoint, Coordinate endPoint){
@@ -662,51 +664,6 @@ public class Board {
 		roomList.get(8).addPassage(CONSERVATORY);
 	}
 
-	public void addWall(int x, int y) {
-		board[x][y] = new Wall();
-	}
-	public void addHallway(int x, int y) {
-		board[x][y] = new Hallway(new Coordinate(x, y));
-	}
-	public void addRoom(int x, int y, int room){
-		board[x][y] = roomList.get(room);
-	}
-
-	public void printBoard(){
-		for (int i = 0; i < board[0].length; i++){
-			for (int j = 0; j < board.length; j++){
-				boolean isPlayer = false;
-				boolean isRoom = false;
-				for (Player p: playerList){
-					if (p.at(new Coordinate(j, i))){
-						System.out.print("P");
-						isPlayer = true;
-					}
-				}
-				if (!isPlayer){
-					for (Room r: roomList){
-						for (Coordinate c: r.getExits()){
-							if (c.getX() == j && c.getY() == i){
-								System.out.print("X");
-								isRoom = true;
-							}
-						}
-					}
-				}
-				if (!isPlayer && !isRoom){
-					if (board[j][i] instanceof Wall){
-						System.out.print("W");
-					} else if (board[j][i] instanceof Room){
-						System.out.print("E");
-					} else if (board[j][i] instanceof Hallway){
-						System.out.print(" ");
-					}
-				}
-			}
-			System.out.println("");
-		}
-	}
-
 	private boolean[][] aStarBoard(){
 		boolean[][] aStarBoard = new boolean[board.length][board[0].length];
 		for (int i = 0; i < board[0].length; i++){
@@ -725,8 +682,52 @@ public class Board {
 		return aStarBoard;
 	}
 
-	public void addMiddleRoom(int x, int y) {
-		board[x][y] = new UnreachableRoom();
+
+	private void populateCharList(){
+		charList.add(new Player(0, 0, 0, false));
+		for (int i = 1; i < 7; i++){
+			charList.add(addPlayer(i, false));
+		}
+	}
+
+	private void cardDistribution(){
+		List<Card> allCards = new ArrayList<Card>();
+		int chara = (int) ((Math.random()*6)+1);
+		for (int i = 1; i < 7; i++){
+			if (i == chara) continue;
+			allCards.add(new CharCard(i));
+		}
+		int weapon = (int) ((Math.random()*6)+1)*10;
+		for (int i = 10; i < 70; i = i + 10){
+			if (i == weapon) continue;
+			allCards.add(new WeaponCard(i));
+		}
+		int roome = (int) ((Math.random()*9)+1)*100;
+		for (int i = 100; i < 1000; i = i + 100){
+			if (i == roome) continue;
+			allCards.add(new RoomCard(i));
+		}
+		solution = chara + weapon + roome;
+		Collections.shuffle(allCards);
+		int i = 0;
+		for (Card c : allCards){
+			playerList.get(i%numPlayers).addCard(c);
+			i++;
+		}
+	}
+	//For automating retrieving things from lists
+	private Player getPlayer(int character){
+		for (Player p:charList){
+			if (p.getChar() == character) return p;
+		}
+		return null;
+	}
+
+	private Room getRoom(int room){
+		for (Room r:roomList){
+			if (r.getName() == room) return r;
+		}
+		return null;
 	}
 
 }
