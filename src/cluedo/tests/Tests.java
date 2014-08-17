@@ -169,10 +169,11 @@ public class Tests {
 		board.startGame();
 		board.rollDice(5);
 		Set<Coordinate> meow = board.getPossibleMoves();
-		System.out.println(meow.size());
-		for (Coordinate c:meow){
-			System.out.println(c);
-		}
+		assertTrue(meow.size() == 9);
+		board.nextTurn();
+		board.rollDice(4);
+		meow = board.getPossibleMoves();
+		assertTrue(meow.size() == 7);
 	}
 
 
