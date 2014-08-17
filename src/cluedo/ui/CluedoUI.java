@@ -10,20 +10,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.stage.Stage;
+//import javafx.embed.swing.JFXPanel;
+//import javafx.scene.media.Media;
+//import javafx.scene.media.MediaPlayer;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -65,8 +59,8 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 	private int currentPlayer = 1;
 	private Map<Integer, String> players;
 	
-	private MediaPlayer mp;
-	private Media medSong;
+//	private MediaPlayer mp;
+//	private Media medSong;
 
 	/**
 	 * Creates and displays the GUI. 
@@ -148,18 +142,21 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 
 		bottomPaneTop = canvas.getHeight() + boardCanvasTop;
 		
-		final CountDownLatch latch = new CountDownLatch(1);
-		SwingUtilities.invokeLater(new Runnable() {
-		    public void run() {
-		        new JFXPanel(); // initializes JavaFX environment
-		        latch.countDown();
-				URL resource = Main.class.getResource("/DowntonAbbey.mp3");
-				medSong = new Media(resource.toString());
-				mp = new MediaPlayer(medSong);
-				mp.setCycleCount(MediaPlayer.INDEFINITE);
-				mp.play();
-		    }
-		});
+		
+		//Unfortunately due to the fact that JavaFX isn't on most machines this code may not work.
+		//If you want sound, install JavaFX And uncomment this code
+//		final CountDownLatch latch = new CountDownLatch(1);
+//		SwingUtilities.invokeLater(new Runnable() {
+//		    public void run() {
+//		        new JFXPanel(); // initializes JavaFX environment
+//		        latch.countDown();
+//				URL resource = Main.class.getResource("/DowntonAbbey.mp3");
+//				medSong = new Media(resource.toString());
+//				mp = new MediaPlayer(medSong);
+//				mp.setCycleCount(MediaPlayer.INDEFINITE);
+//				mp.play();
+//		    }
+//		});
 		this.restart(game);
 	}
 
