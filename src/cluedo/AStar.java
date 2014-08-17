@@ -1,8 +1,7 @@
 package cluedo;
 
-import cluedo.model.Square;
 
-
+@SuppressWarnings("rawtypes")
 public class AStar implements Comparable{
 
 	private AStar parent;

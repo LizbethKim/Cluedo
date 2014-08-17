@@ -59,7 +59,6 @@ public class Board {
 	private int currentMove;
 	private int currentSuggest;		//Current set of cards being suggested
 	private int refutePlayer;		//Used for when going around to refute a suggestion/accusation
-	private int currentAccuse;		//Current set of cards being accused
 	private boolean[][] aStarBoard;
 
 	/*
@@ -76,7 +75,6 @@ public class Board {
 		board = new Square[x][y];
 		currentState = -1;
 		currentSuggest = 0;
-		currentAccuse = 0;
 		roomList = new ArrayList<Room>();
 		playerList = new ArrayList<Player>();
 		charList = new ArrayList<Player>();
@@ -236,7 +234,6 @@ public class Board {
 				playerList.get(currentPlayer).suggestable(false);
 				Player accused = getPlayer(findChar(suggestion));
 				accused.suggestable(true);
-				Room accusedRoom = getRoom(findRoom(suggestion));
 				accused.setCoords(roomCoords.get(convertRoom(suggestion)));
 				accused.setRoom(findRoom(suggestion));
 				this.currentSuggest = suggestion;

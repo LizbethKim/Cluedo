@@ -5,6 +5,7 @@ import java.util.List;
 
 import cluedo.Coordinate;
 
+@SuppressWarnings("rawtypes")
 public class Player implements Comparable{
 
 	private int character;
