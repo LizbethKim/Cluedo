@@ -1,8 +1,6 @@
 package cluedo;
 
-
-@SuppressWarnings("rawtypes")
-public class AStar implements Comparable{
+public class AStar implements Comparable<AStar>{
 
 	private AStar parent;
     private int length;
@@ -29,7 +27,7 @@ public class AStar implements Comparable{
     }
 
 	@Override
-	public int compareTo(Object o) {
+	public int compareTo(AStar o) {
 		if (!(o instanceof AStar)) throw new UnsupportedOperationException();
 		return this.heuristic-((AStar) o).getHeuristic();
 	}
