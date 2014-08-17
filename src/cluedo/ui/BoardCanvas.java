@@ -86,7 +86,6 @@ public class BoardCanvas extends JPanel{
 		shifts.add(new Coordinate(-2, -1));
 		shifts.add(new Coordinate(-2, 1));
 				
-		// TODO position weapons?
 		try {
 		    boardPic = ImageIO.read(new File("assets/board.jpg"));
 		} catch (IOException e) {
