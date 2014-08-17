@@ -39,12 +39,12 @@ public class DicePane extends JPanel {
 		r = new Random();
 		dice = new HashMap<Integer, Image>();
 		try {
-			dice.put(1, ImageIO.read(new File("assets/one.jpg")));
-			dice.put(2, ImageIO.read(new File("assets/two.jpg")));
-			dice.put(3, ImageIO.read(new File("assets/three.jpg")));
-			dice.put(4, ImageIO.read(new File("assets/four.jpg")));
-			dice.put(5, ImageIO.read(new File("assets/five.jpg")));
-			dice.put(6, ImageIO.read(new File("assets/six.jpg")));
+			dice.put(1, ImageIO.read(getClass().getResource("/one.jpg")));
+			dice.put(2, ImageIO.read(getClass().getResource("/two.jpg")));
+			dice.put(3, ImageIO.read(getClass().getResource("/three.jpg")));
+			dice.put(4, ImageIO.read(getClass().getResource("/four.jpg")));
+			dice.put(5, ImageIO.read(getClass().getResource("/five.jpg")));
+			dice.put(6, ImageIO.read(getClass().getResource("/six.jpg")));
 		} catch (IOException e) {
 			System.out.println(e);
 		}

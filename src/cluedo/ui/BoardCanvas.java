@@ -18,6 +18,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import cluedo.Coordinate;
+import cluedo.Main;
 import cluedo.model.Board;
 
 
@@ -86,8 +87,9 @@ public class BoardCanvas extends JPanel{
 		shifts.add(new Coordinate(-2, -1));
 		shifts.add(new Coordinate(-2, 1));
 				
+		// TODO position weapons?
 		try {
-		    boardPic = ImageIO.read(new File("assets/board.jpg"));
+		    boardPic = ImageIO.read(Main.class.getResource("/board.jpg"));
 		} catch (IOException e) {
 			System.out.println(e);
 		}

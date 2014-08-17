@@ -13,6 +13,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+import cluedo.Main;
 import cluedo.model.Board;
 
 /**
@@ -35,27 +36,27 @@ public class CardCanvas extends JPanel {
 		cardsToDisplay = new ArrayList<Integer>();
 		cards = new HashMap<Integer, Image>();
 		try {
-			cards.put(Board.PLUM, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.PLUM) + ".jpg")));
-			cards.put(Board.SCARLETT, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.SCARLETT) + ".jpg")));
-			cards.put(Board.GREEN, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.GREEN) + ".jpg")));
-			cards.put(Board.WHITE, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.WHITE) + ".jpg")));
-			cards.put(Board.PEACOCK, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.PEACOCK) + ".jpg")));
-			cards.put(Board.MUSTARD, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.MUSTARD) + ".jpg")));
-			cards.put(Board.SPANNER, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.SPANNER) + ".jpg")));
-			cards.put(Board.DAGGER, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.DAGGER) + ".jpg")));
-			cards.put(Board.ROPE, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.ROPE) + ".jpg")));
-			cards.put(Board.CANDLESTICK, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.CANDLESTICK) + ".jpg")));
-			cards.put(Board.REVOLVER, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.REVOLVER) + ".jpg")));
-			cards.put(Board.PIPE, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.PIPE) + ".jpg")));
-			cards.put(Board.KITCHEN, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.KITCHEN) + ".jpg")));
-			cards.put(Board.DINING, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.DINING) + ".jpg")));
-			cards.put(Board.BALLROOM, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.BALLROOM) + ".jpg")));
-			cards.put(Board.STUDY, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.STUDY) + ".jpg")));
-			cards.put(Board.CONSERVATORY, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.CONSERVATORY) + ".jpg")));
-			cards.put(Board.LOUNGE, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.LOUNGE) + ".jpg")));
-			cards.put(Board.BILLARD, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.BILLARD) + ".jpg")));
-			cards.put(Board.LIBRARY, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.LIBRARY) + ".jpg")));
-			cards.put(Board.HALL, ImageIO.read(new File("assets/" + CluedoUI.asString(Board.HALL) + ".jpg")));
+			cards.put(Board.PLUM, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.PLUM) + ".jpg")));
+			cards.put(Board.SCARLETT, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.SCARLETT) + ".jpg")));
+			cards.put(Board.GREEN, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.GREEN) + ".jpg")));
+			cards.put(Board.WHITE, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.WHITE) + ".jpg")));
+			cards.put(Board.PEACOCK, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.PEACOCK) + ".jpg")));
+			cards.put(Board.MUSTARD, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.MUSTARD) + ".jpg")));
+			cards.put(Board.SPANNER, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.SPANNER) + ".jpg")));
+			cards.put(Board.DAGGER, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.DAGGER) + ".jpg")));
+			cards.put(Board.ROPE, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.ROPE) + ".jpg")));
+			cards.put(Board.CANDLESTICK, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.CANDLESTICK) + ".jpg")));
+			cards.put(Board.REVOLVER, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.REVOLVER) + ".jpg")));
+			cards.put(Board.PIPE, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.PIPE) + ".jpg")));
+			cards.put(Board.KITCHEN, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.KITCHEN) + ".jpg")));
+			cards.put(Board.DINING, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.DINING) + ".jpg")));
+			cards.put(Board.BALLROOM, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.BALLROOM) + ".jpg")));
+			cards.put(Board.STUDY, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.STUDY) + ".jpg")));
+			cards.put(Board.CONSERVATORY, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.CONSERVATORY) + ".jpg")));
+			cards.put(Board.LOUNGE, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.LOUNGE) + ".jpg")));
+			cards.put(Board.BILLARD, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.BILLARD) + ".jpg")));
+			cards.put(Board.LIBRARY, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.LIBRARY) + ".jpg")));
+			cards.put(Board.HALL, ImageIO.read(Main.class.getResource("/" + CluedoUI.asString(Board.HALL) + ".jpg")));
 		} catch (IOException e) {
 			System.out.println(e);
 		}

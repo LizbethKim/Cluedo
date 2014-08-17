@@ -13,7 +13,17 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
+
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.stage.Stage;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -28,6 +38,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import cluedo.Coordinate;
 import cluedo.Main;
@@ -53,6 +64,9 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 	private Board game;
 	private int currentPlayer = 1;
 	private Map<Integer, String> players;
+	
+	private MediaPlayer mp;
+	private Media medSong;
 
 	/**
 	 * Creates and displays the GUI. 
@@ -133,6 +147,19 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		addMouseListener(this);
 
 		bottomPaneTop = canvas.getHeight() + boardCanvasTop;
+		
+		final CountDownLatch latch = new CountDownLatch(1);
+		SwingUtilities.invokeLater(new Runnable() {
+		    public void run() {
+		        new JFXPanel(); // initializes JavaFX environment
+		        latch.countDown();
+				URL resource = Main.class.getResource("/DowntonAbbey.mp3");
+				medSong = new Media(resource.toString());
+				mp = new MediaPlayer(medSong);
+				mp.setCycleCount(MediaPlayer.INDEFINITE);
+				mp.play();
+		    }
+		});
 		this.restart(game);
 	}
 
@@ -216,7 +243,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 			this.showHelp();
 		} else if (e.getActionCommand().equals("Restart")) {
 			try {
-				this.restart(Main.createBoardFromFile("assets/board.txt"));
+				this.restart(Main.createBoardFromFile("/board.txt"));
 			} catch (IOException err) {
 				System.out.println(err);
 			}
@@ -301,7 +328,7 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 		int playAgain = JOptionPane.showConfirmDialog(this, "Play again?", "", JOptionPane.YES_NO_OPTION);
 		if (playAgain == JOptionPane.YES_OPTION) {
 			try {
-				this.restart(Main.createBoardFromFile("assets/board.txt"));
+				this.restart(Main.createBoardFromFile("board.txt"));
 			} catch (IOException err) {
 				System.out.println(err);
 			}
@@ -311,47 +338,37 @@ public class CluedoUI extends JFrame implements MouseListener, ActionListener {
 	}
 	
 	private void showHelp() {
-		// Shows a window with instructions
-		try {
-			JFrame ruleWindow = new JFrame();
-			ruleWindow.setPreferredSize(new Dimension(460, 400));
-			ruleWindow.setLayout(new BorderLayout());
-			Scanner sc = new Scanner(new File("assets/help.txt"));
-			String text = sc.useDelimiter("\\Z").next();
-			sc.close();
-			JTextArea ta = new JTextArea(text);
-			JScrollPane sp = new JScrollPane(ta);
-			sp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-			ruleWindow.add(sp, BorderLayout.CENTER);
-			ruleWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			ruleWindow.pack();
-			ruleWindow.setResizable(false);
-			ruleWindow.setVisible(true);
-		} catch (FileNotFoundException err) {
-			System.out.println(err);
-		}
+		JFrame ruleWindow = new JFrame();
+		ruleWindow.setPreferredSize(new Dimension(460, 400));
+		ruleWindow.setLayout(new BorderLayout());
+		Scanner sc = new Scanner(getClass().getResourceAsStream("/help.txt"));
+		String text = sc.useDelimiter("\\Z").next();
+		sc.close();
+		JTextArea ta = new JTextArea(text);
+		JScrollPane sp = new JScrollPane(ta);
+		sp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		ruleWindow.add(sp, BorderLayout.CENTER);
+		ruleWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		ruleWindow.pack();
+		ruleWindow.setResizable(false);
+		ruleWindow.setVisible(true);
 	}
 	
 	private void showRules() {
-		// Shows a window with the rules
-		try {
-			JFrame ruleWindow = new JFrame();
-			ruleWindow.setPreferredSize(new Dimension(630, 700));
-			ruleWindow.setLayout(new BorderLayout());
-			Scanner sc = new Scanner(new File("assets/rules.txt"));
-			String text = sc.useDelimiter("\\Z").next();
-			sc.close();
-			JTextArea ta = new JTextArea(text);
-			JScrollPane sp = new JScrollPane(ta);
-			sp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-			ruleWindow.add(sp, BorderLayout.CENTER);
-			ruleWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			ruleWindow.pack();
-			ruleWindow.setResizable(false);
-			ruleWindow.setVisible(true);
-		} catch (FileNotFoundException err) {
-			System.out.println(err);
-		}
+		JFrame ruleWindow = new JFrame();
+		ruleWindow.setPreferredSize(new Dimension(630, 700));
+		ruleWindow.setLayout(new BorderLayout());
+		Scanner sc = new Scanner(getClass().getResourceAsStream("/rules.txt"));
+		String text = sc.useDelimiter("\\Z").next();
+		sc.close();
+		JTextArea ta = new JTextArea(text);
+		JScrollPane sp = new JScrollPane(ta);
+		sp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		ruleWindow.add(sp, BorderLayout.CENTER);
+		ruleWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		ruleWindow.pack();
+		ruleWindow.setResizable(false);
+		ruleWindow.setVisible(true);
 	}
 	
 	/*

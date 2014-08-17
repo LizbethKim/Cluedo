@@ -1,0 +1,23 @@
+Click the dice to roll them at the start of your turn.
+
+If you wish to travel through a secret passage, click the room at the 
+other end instead of rolling your dice.
+
+If you wish to make an accusation, click the centre room instead of 
+rolling your dice. Accusations may happen at the beginning of a turn.
+
+If you choose to roll the dice, the amount you have left to travel 
+will be displayed in the bottom right corner. If you travel less than 
+this amount, you may travel again until you have used up your moves.
+Entering a room will end your movement.
+
+If your token has been moved into a room during play as part of 
+another player's suggestion, you may start your turn with a suggestion
+rather than rolling the dice. Click the room you are in instead of 
+rolling the dice if you wish to do this.
+
+Use the list down the right of the window to keep track of what you
+believe has been eliminated.
+
+When you refute another player's suggestion, ensure only that player
+can see the screen after you click refute.

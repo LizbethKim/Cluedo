@@ -1,8 +1,9 @@
 package cluedo;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import cluedo.model.Board;
@@ -12,7 +13,7 @@ public class Main {
 
 	public static void main(String[] args){
 		try {
-			Board board = createBoardFromFile("assets/board.txt");
+			Board board = createBoardFromFile("/board.txt");
 			new CluedoUI(board);
 		} catch (IOException e) {e.printStackTrace();}
 	}
@@ -25,8 +26,9 @@ public class Main {
 	 * @throws IOException For if invalid file
 	 */
 	public static Board createBoardFromFile(String filename) throws IOException {
-		FileReader fr = new FileReader(filename);
-		BufferedReader br = new BufferedReader(fr);
+		InputStream styleFile = Main.class.getResourceAsStream(
+	            filename);
+		BufferedReader br = new BufferedReader(new InputStreamReader(styleFile));
 		ArrayList<String> lines = new ArrayList<String>();
 		int width = -1;
 		String line;
